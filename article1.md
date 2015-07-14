@@ -25,7 +25,7 @@ the relevant scope, a variable can be identified by the order it is defined in.
 
 
 As an example, consider the case of defining a variable in Visual Basic:
-```vbscript
+```
 Dim num1, num2 As Integer
 Dim text As String
 ```

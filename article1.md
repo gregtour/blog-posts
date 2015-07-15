@@ -427,6 +427,10 @@ In order to do this, the parser needs a large table to guide it in its operation
 rules to our production grammar and it will outline a finite number of states that the parser can exist in while it is
 in the process of parsing.
 
+
+##### Context-Free Grammars
+
+
 Let us first look at an example from our grammar.
 
 ```
@@ -446,7 +450,8 @@ which is also a subset of our programming language's final context-free grammar.
 
 
 ```
-<S> ::= ( <S> ) <S>
+<S> ::= ( <S> )
+<S> ::= <S> <S>
 <S> ::= <epsilon>
 ```
 
@@ -503,6 +508,7 @@ a left-hand side (LHS) non-terminal symbol and a right-hand side (RHS) of termin
 which are determined by identifying integer constants. We also have a table of keywords and symbol glyphs that we can
 provide to the lexer.
 
+##### Building LR(1) Parse Tables
 
 The process of building a parse table from the grammar is slightly more complex. In a pseudo-overview of the 
 algorithm, the process is as follows. First, nullable non-terminals must be identified. These are any of the cases
@@ -527,8 +533,71 @@ to next. In the case of the root or base production, the follow set will include
 include the set of terminals that may come after that production in any context it might be found in this given
 grammar.
 
+###### First Set Examples
 
-... Include an example of the nullable non-terminals, FIRST, and FOLLOW sets for each example grammar ...
+We have already determined the nullable non-terminals fairly easily. In practice, a larger context-free grammar may be
+complex enough that it would take a fair bit more work. In any case, I'm relatively certain that we can implement this
+logic in code.
+
+
+To help in understanding the concept of the FIRST(a) set, I will give examples for each of the (small) sample grammars.
+
+An example from the arithmetic language.
+
+| Symbol | First Set |
+|--------|-----------|
+|\<expr\> | integer |
+|\<term\> | integer |
+|\<factor\> | integer |
+
+Here we see that, each of these productions must begin with an integer token.
+
+Now consider the parentheses language.
+
+| Symbol | First Set |
+|--------|-----------|
+| \<S\> | ( |
+
+This one is even simpler. The only token that begin the \<S\> symbol or the main symbol in our grammar is the open 
+parentheses symbol. In the case that it is empty, I suppose the first token might be \<epsilon\> but this is information
+we already have from the nullable non-terminals set.
+
+###### Follow Set Examples
+
+Now for examples from the follow set. These sets require the FIRST set to generate, but they also must consider other
+tokens in a production rule. Building these sets involves looking at each production rule and seeing what tokens follow
+any possible symbols. In addition, the process is only complete when all possibilities have been considered. Since each
+symbol could be dependent on another symbols FIRST and FOLLOW sets, the algorithm really must be ran repeatedly until
+there are no more changes to the FOLLOW set.
+
+Here, let's look at the arithmetic language.
+
+| Symbol | Follow Set |
+|--------|-----------|
+|\<expr\> | +, \<$\> |
+|\<term\> | *, +, \<$\> |
+|\<factor\> | *, +, \<$\> |
+
+In this case, we've added the end of file token. That's because any of these symbols can be the last symbol in our
+language. The only thing following that is our end of input. An expression can be followed by a '+' plus sign, we can
+identify that from our first rule. There's nothing else that can follow it because no other rule uses the \<expr\> symbol
+on the right-hand side (aside from our implicit rule, \<start\> ::= \<expr\> \<$\>). Next we look at the \<term\> symbol.
+In rule #2, \<term\> is followed by a '*' multiplication sign. Rule #3 says a \<term\> can be used anywhere an \<expr\>
+is, so \<term\>'s follow set must include \<expr\>'s follow set as a sub-set. The same goes for our \<factor\> symbol.
+
+Now let's look at the balanced parentheses language.
+
+| Symbol | Follow Set |
+|--------|------------|
+|\<S\> | (, ), \<$\> |
+
+It's clear from rule #1 that ')' should be in the follow set. It follows \<S\> right? And it's also clear from rules #0
+and #1 that \<$\> would be in the follow set again. But where does the '(' opening parentheses symbol come from? Consider
+rule #2 where \<S\> **::=** \<S\> \<S\>. As \<S\> follows \<S\>, all of the elements from the First set for \<S\> must be
+in the Follow set for \<S\>. So we add that opening parentheses sign.
+
+
+###### The Canonical Collection of LR(1) Item Sets
 
 
 With these sets generated, the canonical collection is the penultimate set to be constructed. Using a pair of
@@ -546,6 +615,37 @@ from the program input. The accept action indicates that the parsing operation i
 create a matching syntax tree from the source because it does not recognize the language, then a number of different 
 errors may occur which prevent the source from being accepted. 
 
+The actual code for building the LR(1) parse tables is as follows:
+```C
+int BuildLRParser(GRAMMAR_TABLE grammar,
+                  LR_TABLE*     parser)
+{
+    LR_ITEM_COLLECTION* C;
+
+    FindNullableNonterminals(&grammar);
+    BuildFirstSets(&grammar);
+    BuildFollowSets(&grammar);
+    
+    // building the collection of item sets for an LR(1) grammar
+    C = CanonicalCollection(&grammar);
+    RemoveEpsilons(&grammar);
+    *parser = ConstructTable(C, &grammar);
+    FreeCollection(C);
+    return 0;
+}
+```
+
+
+Again, this process starts with rules and building the First and Follow sets after finding nullable non-terminal symbols.
+Then the canonical collection is formed by taking LR items, which are productions paired with a parsing position. We write
+this as a dot in the middle of the production. This information is combined with a lookahead symbol, which provides 
+information about the next expected input. Starting from beginning of the root production with an end of file lookahead,
+the canonical collection builds an LR item set. The algorithm repeatedly advances the token and finds the closure of these
+items to expand the set. There are other sets that do not fit inside the closure of this item set, so the canonical
+collection is a collection built from these sets. 
+
+
+##### Stack-based Parsing
 
 The parser itself starts from state zero and works from the token stream yielded by the lexer to provide input to the
 LR(1) algorithm. Actions are pulled from the action table based on this input token and the parsers state. If a

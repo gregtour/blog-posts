@@ -43,8 +43,8 @@ type information.
 
 Additional examples of dynamically typed languages besides JavaScript include Python, Ruby, Lua, Scheme and Lisp, and
 a number of others. Aside from the style of syntax and the degree of expressiveness, these programming languages are
-largely similar because of their type system. So called dynamically typed languages are often referred to as duck-typed
- or duck languages.
+largely similar because of their type system. So called dynamically typed languages are sometimes referred to as
+duck-typed or duck languages.
 
 
 Adopting many of these identifying features, and really as an exercise in constructing a language from basic parts, we
@@ -314,9 +314,11 @@ identify the tokens that make up _Duck source code_.
 
 At this point, we already have tables of keywords and symbols to begin with, and if we don't, it is something that we
 will generate in one of the next steps that we can save and store to use for the lexer. In any case, we can list off
-all of the keywords and symbols that we would like to use for your programming language. In this case those keywords are:
+all of the keywords and symbols that we would like to use for your programming language. In this case those keywords
+are:
 
-> import, include, return, break, continue, throw, function, end, if, then, else, for, to, do, loop, step, in, while, let, begin, try, complete, catch, object, static, operator, this, and, or, not, is, mod, new, true, false
+> import, include, return, break, continue, throw, function, end, if, then, else, for, to, do, loop, step, in, while,
+let, begin, try, complete, catch, object, static, operator, this, and, or, not, is, mod, new, true, false
 
 Some of these include keywords for features we haven't discussed implementing. This is fine, we can use them as
 reserved words while we contemplate the additions we can make to the language down the road.

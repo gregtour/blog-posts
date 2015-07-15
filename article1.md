@@ -707,8 +707,10 @@ an interpreter. This just shows how interesting programming language design can 
 applications.
 
 
-#### Part 7: The Library
+#### Part 7: The VM Environment
 
-#### Part 8: The Garbage Collector
+#### Part 8: The Library
+
+#### Part 9: The Garbage Collector
 
 #### End Notes

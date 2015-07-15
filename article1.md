@@ -586,7 +586,7 @@ In this case, we've added the end of file token. That's because any of these sym
 language. The only thing following that is our end of input. An expression can be followed by a '+' plus sign, we can
 identify that from our first rule. There's nothing else that can follow it because no other rule uses the \<expr\>
 symbol on the right-hand side (aside from our implicit rule, *\<start\> ::= \<expr\> \<$\>*). Next we look at the
-\<term\> symbol. In rule #2, \<term\> is followed by a '*' multiplication sign. Rule #3 says a \<term\> can be used
+\<term\> symbol. In rule \#2, \<term\> is followed by a '*' multiplication sign. Rule \#3 says a \<term\> can be used
 anywhere an \<expr\> is, so \<term\>'s follow set must include \<expr\>'s follow set as a sub-set. The same goes for
 our \<factor\> symbol.
 
@@ -596,9 +596,9 @@ Now let's look at the balanced parentheses language.
 |--------|-----------:|
 |\<S\> | (, ), \<$\> |
 
-It's clear from rule #1 that ')' should be in the follow set. It follows \<S\> right? And it's also clear from rules
-#0 and #1 that \<$\> would be in the follow set again. But where does the '(' opening parentheses symbol come from?
-Consider rule #2 where *\<S\> ::= \<S\> \<S\>*. As \<S\> follows \<S\>, all of the elements from the First set for
+It's clear from rule \#1 that ')' should be in the follow set. It follows \<S\> right? And it's also clear from rules
+\#0 and \#1 that \<$\> would be in the follow set again. But where does the '(' opening parentheses symbol come from?
+Consider rule \#2 where *\<S\> ::= \<S\> \<S\>*. As \<S\> follows \<S\>, all of the elements from the First set for
 \<S\> must be in the Follow set for \<S\>. So we add that opening parentheses sign.
 
 Note: things can get more complex when we have nullable non-terminal symbols sandwiched in the middle of a grammar

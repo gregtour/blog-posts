@@ -52,9 +52,10 @@ will build the _Duck programming language_ from the ground up. We will explore t
 pragmatism or practicality. Indeed, any ideas of utility will come only after we have completed the process.
 
 
-As this guide is minimal at best in explaining each of the complex steps involved in crafting a programming language,
-many concepts are taken as given information. It may be best to approach this topic after having done a fair bit of
-research and after gathering experience in programming in a number of different languages.
+As a fair warning, I feel I should mention that the upcoming sections may contain some complex material, even though
+it is presented plainly and simply wherever it can be. For that reason, I would recommend the reader do some research
+on the topic of programming language design before embarking on this journey. With that said, we are on our way.
+
 
 
 #### Part 2: The Syntax
@@ -223,9 +224,9 @@ Roughly this is a description of the language we intend to create.
 
 A casual reader following along might not be interested in developing their own language, as of this moment. They
 might be more interested in the mechanics involved. As a rather elaborate exercise, I invite anyone to attempt to
-create their own _duck language_ compatible runtime environment. That being said, I am about to outline the process
-and tools that I used to create this language, even though I recognize there are multiple ways to go about the
-process. 
+create their own interpreted programming language. That being said, I am about to outline the process
+and tools that I used to create _the duck programming language_, even though I recognize there are multiple ways to go
+about the process. 
 
 
 For example, I chose to write everything in the C programming language. This is really a more difficult task than it

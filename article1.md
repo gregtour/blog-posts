@@ -558,9 +558,10 @@ Now consider the parentheses language.
 |--------|-----------|
 | \<S\> | ( |
 
-This one is even simpler. The only token that begin the \<S\> symbol or the main symbol in our grammar is the open 
-parentheses symbol. In the case that it is empty, I suppose the first token might be \<epsilon\> but this is information
-we already have from the nullable non-terminals set.
+This one is even simpler. The only token that begins the \<S\> symbol's production in our grammar is the open 
+parentheses symbol. In the case that it is empty, I suppose the first token might be \<epsilon\> but this is
+information we already have from the nullable non-terminals set, and we generally won't consider \<epsilon\> as a
+terminal token.
 
 ###### Follow Set Examples
 

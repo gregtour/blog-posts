@@ -2,18 +2,6 @@
 > Designing a language and building an interpreter from concept to evolution.
 
 
-#### Contents
-#### Part 1: The Premise
-#### Part 2: The Syntax
-#### Part 3: The Setup
-#### Part 4: The Lexer
-#### Part 5: The Parser
-#### Part 6: The Interpreter
-#### Part 7: The Library
-#### Part 8: The Garbage Collector
-#### End Notes
-
-
 
 #### Part 1: The Premise
 
@@ -24,7 +12,7 @@ might not always hold true is that programs written in static languages are comp
 programs that are written in dynamic languages run in an interpreter. 
 
 
-Testing the definitions of what makes a language static or dynamic might illuminate this more. In a static language,
+Testing the definitions of what makes a language static or dynamic might illustrate this more. In a static language,
 variables and procedures have rigidly defined types. Attempting to access a value that has not been named in a
 relevant scope leads to a syntax error issued at compile time. The programming language is organized in such a way
 that, when it is analyzed at a source level, the locations of all variables and functions are known by lexical
@@ -32,7 +20,7 @@ address: i.e. given the relevant scope, a variable can be identified by the orde
 
 
 As an example, consider the case of defining a variable in Visual Basic:
-```
+```vb
 Dim num1, num2 As Integer
 Dim text As String
 ```
@@ -101,46 +89,133 @@ of a statement list. Given a function declaration, a kind of statement, there is
 parameter names, and a list of statements making up the body. An If/Else statement has a similar nature. It is a 
 statement that contains additional statements.
 
+To provide a little bit of framework to work from, let's write down what some of these ideas might look like.
+
+```
+if some condition then
+
+    here is a block of statements
+    
+end
+```
+
+This is what our basic if statement looks like. Considering that we will often want to execute statements if our
+condition is false, we better add support for else statements, too.
+
+```
+if some condition then
+
+    here is a block of statements
+    to run if the condition is true
+
+else
+
+    here is a block of statements
+    to run if the condition is false
+    
+end
+```
+
+Looking at the syntax we have, we seem to have borrowed the end-block notation from Lua. I guess this is just
+coincidental. We could just as easily have styled our language after BASIC and terminated IF statements with ENDIF
+rather than simply the keyword **end**. I don't have any real justification for this.
+
+What I would justify, however, is the use of real words in syntax. I think this is plainer and more easily readable
+or simpler to understand than using a large amount of syntactic symbols to delineate blocks and other control
+structures. So wherever we can, we will use whole words in our language's grammar.
+
+As before we introduced the idea of a function definition, or a function declaration, let's jot down what that looks
+like.
+
+
+```
+function our_new_function(parameter1, parameters2)
+
+    here we have statements that do work
+    if this function returns a value then we might have
+    
+    return ourResult
+    
+    at the end
+
+end
+```
 
 We won't put any limitations on the placement of these. Functions can be defined inside of functions. In this case
 they will be local to where they are defined. We don't want to introduce limitations when forming our definitions from
 the start, because they might be based on expectations that aren't true. If the limitations we impose on ourselves are
 artificial, then we will be putting time and effort into enforcing artificial limitations, and that becomes wasted
-effort.
+effort. On functions, the use of **end** as a keyword seems more justifiable, as it is much shorter than 
+**end function**. A good middle-ground might be **endf**. This depends on if we want to allow END to be a specific
+command that terminates the running program. I always thought this might be a useful instruction, but it's not often
+included in languages. Instead, we might have a system command for quit() that we can invoke from our program.
 
 
 Our language must have some common ground with existing languages, so we will use familiar constructs like for loops
 and while loops. For loops will use ranges in an explicit way. There will be a beginning value and ending value, and
 the loop body will be executed for both of these and every value in between. This is assuming we are starting with
-integers, or possibly floating-point numbers, but always increasing by increments of one. 
+integers, or possibly floating-point numbers, but always increasing by increments of one.
+
+
+Our for loop syntax.
+
+```
+for j = 1 to 100 do
+
+    this prints the numbers 1 through 100
+    println(j)
+
+loop
+```
+
+
+
+Our while loop syntax.
+
+```
+while running do
+
+    println("still running")
+
+loop
+```
 
 
 We will allow all of the basic operations we have come to expect. Namely addition, subtraction, multiplication, and
 division, as well as modulo division (something we could implement ourselves), string concatenation for convenience,
-negation, not, and Boolean expressions. These are fundamentals we've come to expect.
+negation, not, and Boolean expressions. These are the fundamentals.
 
 
-What we are trying to accomplish is creating the most flexible and malleable language, so we must also think of
+We are trying to accomplish creating the most flexible and programmable language, so we must also think of
 distinctly dynamic elements that we can add. Arrays are fundamentally useful. Let's add arrays that allow the use of
 any index, without specifying a container size. Let's expand this array functionality to allow for values of any type
 to be used as indices. Furthermore, let's create dictionary types with a familiar object notation. These will be
 similar to classes or structs from related languages. To increase flexibility, these will be the same object
-internally as arrays, and the syntax for each can be used interchangeably. In order to keep track of objects and
-complex types, it makes sense to implement memory management through garbage collection, instead of passing that large
-responsibility on to the programmer adapting to use our language.
+internally as arrays, and the syntax for each can be used interchangeably.
+
+```
+    arr1 = []
+    arr2 = [1, 2, 3, 4]
+    dict2 = {firstArray: arr1, secondArray: arr2}
+    dict1 = {"a": 1, "b": 2, "c": 3}
+    arr2[4] = 5
+    dict2.arr2[5] = 6
+    dict1.d = 4
+```
+
+Our array and dictionary example.
 
 
 Another feature that increases our flexibility is allowing functions to be first-class objects. This means that we can
 use functions as parameters, return them as values, and assign them to named variables. We can rename a function and
 use the original name for something else. We can attach functions to objects and use them as classes. Although passing
 functions as first-class objects is a functional idea, here it overlaps with the ideas of dynamic languages so we will
-adopt this feature.
+adopt this feature. In order to keep track of objects and complex types, it makes sense to implement memory management
+through garbage collection, instead of passing that large responsibility on to the programmer adapting to use our
+language.
 
 
-Roughly this is a description of the language we intend to create. We haven't written down anything concrete as to the
-style yet, but we have a solid understanding of what we want programs to look like and what features they can use to
-implement their logic.
-
+Roughly this is a description of the language we intend to create. 
 
 
 #### Part 3: The Setup
@@ -176,27 +251,26 @@ language, like JavaScript or Python, before being executed. That would be fine b
 compiling and other complexities which are best addressed in section II of this series.
 
 
-Reasons supporting my decision to use C are chiefly:
+Reasons supporting my decision to use C are chiefly that:
 
-A) That it is portable. A program written in C can be deployed on virtually any operating system. It is easy to
+<ul>
+<li> It is portable. A program written in C can be deployed on virtually any operating system. It is easy to
 compile for any device and can be executed on almost any microprocessor. Especially when this code is written with the
 standards in mind. I would also choose to avoid any new features in the language to maximize compatibility.
 
-
-B) It is low-level. Without delving into assembly and machine code itself, C represents a close barrier to the target
+<li> It is low-level. Without delving into assembly and machine code itself, C represents a close barrier to the target
 machine itself. Not knowing what CPU our code will execute on or the exact layout of registers, we want to be aware of
 what sort of instructions will be executed and how our program will be laid out in memory.
 
-
-C) It is not garbage collected. While this point can be debated, the purpose of this project is in ways to create
+<li> It is not garbage collected. While this point can be debated, the purpose of this project is in ways to create
 something new. So, creating a new language with higher level features, it is easier to feel a sense of accomplishment
 when we are working on features we didn't have from the start. This also helps us to have control over the runtime for
 our final interpreter, as we are being dealt the responsibility of memory management ourselves.
 
-
-D) It's difficult. This hardly qualifies as a reason. I would say that one reason would be '_because it is fast_,' but
+<li> It's difficult. This hardly qualifies as a reason. I would say that one reason would be '_because it is fast_,' but
 knowing how the process of writing has gone, it is neither fast to implement nor necessarily the fastest resulting
 code. But true to form, this exercise will be a challenge, so it might as well be a good one.
+</ul>
 
 Now this doesn't particularly qualify as a language concern, but as an additional challenge, the project is being
 built from the ground-up, in a pulled-up-by-its-own-bootstraps kind of way. That means, as you see the parts of
@@ -322,22 +396,23 @@ and possibly its runtime efficiency. As a counterpoint, it might be very flexibl
 I would also like to note that, as one method of by-hand parsing, the top-down recursive descent parser lies close to
 an area of do-it-yourself parsing techniques that might very well be able to parse any grammar. From a computational
 theory perspective, a function can be written in any sufficiently suitable language to recognize any deterministic
-language. But we are looking for more of a sure footed answer than that.
+language. But we are looking for a more sure-footed answer than that.
 
 The legendary green and red dragon books, by Aho and Ulman and Aho, Sethi, and Ulman.
 
 ![The Green Dragon Book](green.jpg?raw=true "Green") ![The Red Dragon Book](red.jpg?raw=true "Red")
 
 So we turn to the Dragon Book for answers. I was unable to find a copy of the green dragon book, which is maybe the
-oldest of yore, "Principles of Compiler Design," but I did have a copy on hand of "Compilers: Principles, Techniques,
-and Tools," 1st Edition, or the red dragon book.
+oldest of yore, "Principles of Compiler Design," but I did have "Compilers: Principles, Techniques, and Tools," 1st
+Edition on hand, or the red dragon book.
 
-Around page 160 in this book is a lot of detail into compiler frontends and specifically parsers. Over one hundred
-pages dedicated to the topic really provide more detail than is necessary even for a language designer, but after
-studying and implementing the algorithms provided, it is still possible to feel a lack of understanding. So we will
-take a brief overview of what LR(k) languages are, what LR(1) languages are, and how we can use the LR algorithm to
-write a generic parser for any sort of grammar we can think of. We will be working with context-free grammars and we
-will need to come up with our own notation, so we will use BNF form because it is easily understood.
+Around page one hundred sixty in this book is quite a bit of detail into compiler frontends and specifically parsers.
+Over one hundred pages dedicated to the topic really provide more detail than is necessary, even for a language
+designer, but after studying and implementing the algorithms provided, it is still possible to feel a lack of
+understanding. So we will take a brief overview of what LR(k) languages are, what LR(1) languages are, and how we can
+use the LR algorithm to write a generic parser for any sort of grammar we can think of. We will be working with
+context-free grammars and we will need to come up with our own notation, so we will use BNF form because it is easily
+understood.
 
 What we are describing is a bottom-up parser that works from left to right and produces a rightmost derivation. The
 parser takes our input stream of tokens and it creates an abstract syntax tree, a tree of related productions, based

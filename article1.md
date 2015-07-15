@@ -39,7 +39,7 @@ Dim text As String
 
 
 This would be the prototype for a static language. When variables are first declared, they must be paired with a type.
-In order to compare with a dynamicly typed language, let us look at an example from ECMA script or JavaScript.
+In order to compare with a dynamically typed language, let us look at an example from ECMA script or JavaScript.
 
 
 ```javascript
@@ -55,7 +55,7 @@ type information.
 
 Additional examples of dynamically typed languages besides JavaScript include Python, Ruby, Lua, Scheme and Lisp, and
 a number of others. Aside from the style of syntax and the degree of expressiveness, these programming languages are
-largely similar because of their type system. So called dynamicly typed languages are often referred to as duck-typed
+largely similar because of their type system. So called dynamically typed languages are often referred to as duck-typed
 or 'Duck' languages.
 
 
@@ -85,7 +85,7 @@ to every problem, and having a way to change things or reuse our efforts is alwa
 With that in mind, we will sort of gloss over what the fundamental mechanics of the 'Duck' language are at the atomic
 level. Instead, we will explore what the essence is. We want to discover the intention of the language itself.
 If we can get into the mind, the feng shui or the essential attitudes of the programming language, that would be
-enough. Still, programming languages are systems that we use to express ideas. And for any manner ofcommunication to
+enough. Still, programming languages are systems that we use to express ideas. And for any manner of communication to
 be useful, we need to have some common ground.
 
 
@@ -115,15 +115,15 @@ integers, or possibly floating-point numbers, but always increasing by increment
 
 We will allow all of the basic operations we have come to expect. Namely addition, subtraction, multiplication, and
 division, as well as modulo division (something we could implement ourselves), string concatenation for convenience,
-negation, not, and boolean expressions. These are fundamentals we've come to expect.
+negation, not, and Boolean expressions. These are fundamentals we've come to expect.
 
 
 What we are trying to accomplish is creating the most flexible and malleable language, so we must also think of
-distincly dynamic elements that we can add. Arrays are fundamentally useful. Let's add arrays that allow the use of
+distinctly dynamic elements that we can add. Arrays are fundamentally useful. Let's add arrays that allow the use of
 any index, without specifying a container size. Let's expand this array functionality to allow for values of any type
 to be used as indices. Furthermore, let's create dictionary types with a familiar object notation. These will be
 similar to classes or structs from related languages. To increase flexibility, these will be the same object
-internally as arrays, and the syntax for each can be used interchangably. In order to keep track of objects and
+internally as arrays, and the syntax for each can be used interchangeably. In order to keep track of objects and
 complex types, it makes sense to implement memory management through garbage collection, instead of passing that large
 responsibility on to the programmer adapting to use our language.
 
@@ -157,7 +157,7 @@ start from the get-go with handwritten assembly language. This is not a very por
 developer might start with a modern language like Java or C#. These are great choices and I would encourage picking up
 whatever tools you are familiar with. For reasons that may or may not be obvious, I would recommend fashioning this
 dynamic language we are creating in a static host environment. So, a language like Go would be preferred to Scheme. I
-know that a number of courses teach programming langauges by implementing a Scheme or Lisp interpreter. What we are
+know that a number of courses teach programming languages by implementing a Scheme or Lisp interpreter. What we are
 doing is not far off from that except for large differences in style and syntax. And usually these courses require
 writing the language interpreter in the language itself, or involve a similar kind of task. The reason I would
 recommend staying away from this course is because it begins to lead to deliberately impractical solutions. The
@@ -167,7 +167,7 @@ there are ways to improve productivity and performance by creating a special dia
 entirely new language.
 
 
-I will note that there is one way that implementing this dynamic language in an interpreted or scripting langauge
+I will note that there is one way that implementing this dynamic language in an interpreted or scripting language
 might be helpful, and that would be in the case of cross-compiling. I.e. having our 'duck' code reduced to some other
 language, like JavaScript or Python, before being executed. That would be fine but then we are dealing with code 
 compiling and other complexities which are best addressed in section II of this series.
@@ -187,7 +187,7 @@ what sort of instructions will be executed and how our program will be laid out 
 
 C) It is not garbage collected. While this point can be debated, the purpose of this project is in ways to create
 something new. So, creating a new language with higher level features, it is easier to feel a sense of accomplishment
-when we are working on featuers we didn't have from the start. This also helps us to have control over the runtime for
+when we are working on features we didn't have from the start. This also helps us to have control over the runtime for
 our final interpreter, as we are being dealt the responsibility of memory management ourselves.
 
 
@@ -216,7 +216,7 @@ project before you finish reading this guide.
 
 Even considering our target platform and the technical specs we are about to jump through, there will be very little
 actual code provided or directly cited. There may be resources attached, but, in general things will be outlined from
-an algorithmic approach or described in psuedo-code. There is no reason to go about annotations on a line by line
+an algorithmic approach or described in pseudo-code. There is no reason to go about annotations on a line by line
 basis.
 
 
@@ -248,7 +248,7 @@ reserved words while we contemplate the additions we can make to the language do
 
 Our lexer will begin by looking at the next input character. Here at the start, we will look at the first 
 non-commented out character in our source file's source text. It may be a letter, a number, another type of glyph like
-a parenthese or plus-sign, a whitespace character, or a newline character. If it is a whitespace character we can
+parentheses or a plus-sign, a whitespace character, or a newline character. If it is a whitespace character we can
 ignore it. At this point, we are only using whitespace as a delimiter. It marks a boundary between tokens that must
 be separated, like keywords and identifier names. Not all tokens will be divided by whitespace, as it is possible for
 certain characters to follow each other that form different tokens. 
@@ -270,9 +270,10 @@ or a float to our lexer tokens and include the literal string for the sequence t
 value. 
 
 
-If we hit a symbol glyph, which we will use to unambigously refer to characters that are not alphanumeric, whitespace,
-or newlines, then we will find the longest sequence of glyphs that correctly match a preset collection of tokens and
-add that token to our list of tokens. When I talk about a preset collection of tokens, I refer to the following set, which we will be generating soon in the next step.
+If we hit a symbol glyph, which we will use to unambiguously refer to characters that are not alphanumeric,
+whitespace, or newlines, then we will find the longest sequence of glyphs that correctly match a preset collection of
+tokens and add that token to our list of tokens. When I talk about a preset collection of tokens, I refer to the
+following set, which we will be generating soon in the next step.
 
 
 These built-in token symbols used in our programming language are:
@@ -281,7 +282,7 @@ These built-in token symbols used in our programming language are:
 
 Noticing that we notably missed quotation marks, we must go back and add strings to the collection of objects that we
 lex, mainly because we do not want to be lexing what's on the inside of quoted strings, and we certainly don't want
-to be parsing them, either. So if we encounter a glyph that is a string, or spefically if we encounter a character
+to be parsing them, either. So if we encounter a glyph that is a string, or specifically if we encounter a character
 that is an opening quotation mark, so either a single or double-quote, then we must scan the input until we find the 
 matching end quotation. We'll then add this to our list of lexemes as a string token, and include the quoted text as
 the literal string. 
@@ -309,14 +310,14 @@ specific language that we are constructing. If we were really in-tune with what 
 language to look like and how it should behave, we might be able to wrap the parsing and lexing steps all in to
 one. Or in any case, we could forego 'generating' a parser and start writing one by hand.
 
-This would be in liue of formalizing the language's grammar. Instead, we would create our own specially crafted loop
+This would be in lieu of formalizing the language's grammar. Instead, we would create our own specially crafted loop
 that would process each kind of statement, and in-turn would match up symbols. This describes what might be called a
 "recursive descent parser" and it is one form of top-down parsing.
 
 Unfortunately, top down parsers have their limitations. Without getting too pedantic, we will simply say that our
 recursive descent parser would be limited by its complexity in writing, the set of language structures it could parse,
 and possibly its runtime efficiency. As a counterpoint, it might be very flexible to minor changes in the language.
-I would also like to note that, as one method of by-hand parsing, the top-down recusrive descent parser lies close to
+I would also like to note that, as one method of by-hand parsing, the top-down recursive descent parser lies close to
 an area of do-it-yourself parsing techniques that might very well be able to parse any grammar. From a computational
 theory perspective, a function can be written in any sufficiently suitable language to recognize any deterministic
 language. But we are looking for more of a sure footed answer than that.
@@ -369,8 +370,8 @@ notions about what our formalized grammars will look like, and as we begin to op
 how we will be formally operating on them. Our grammar is formed with a set of rules that we will call productions,
 ordered by the line number they appear on. Implicitly, we will have a rule introduced when we load this grammar from
 file that says the program root reduces to the first non-terminal symbol we see, which is the left-hand side of the
-first production. In example 1 above, this is the <expr> symbol. In the balanced parentheses language, example 2, that
-is the <S> symbol.
+first production. In example 1 above, this is the \<expr\> symbol. In the balanced parentheses language, example 2,
+that is the \<S\> symbol.
 
 
 This leads to the next major concept. Our grammar is formed by terminal and non-terminal symbols/tokens. The plus '+'
@@ -378,13 +379,14 @@ sign in the first example is a token. Therefore it is a terminal. There is no wa
 more symbols or tokens in our program. It itself is a terminal production.
 
 
-Non-terminals are symbols that we defined in the grammar itself. <expr>, <term> and <factor> are all non-terminal
-symbols. <S> is also a non-terminal. As we have formed rules with left and right-hand sides, devided by the '::='
-operator, we've noticed that symbols are delimited by angle braces. And we've already accounted for the tokens that
-we recognize as being terminal symbols. So what about the other symbols? <integer> is a built in terminal. It is
-synonymous with the lexer token produced by integers in the lexing phase. Similarly, <epsilon> is a built in terminal.
-It is something that we are defining inside of the parser. But what does it represent? It represents an empty
-production. In the case of the second example, it is the production we reach when we run out of parentheses. 
+Non-terminals are symbols that we defined in the grammar itself. \<expr\>, \<term\> and \<factor\> are all
+non-terminal symbols. \<S\> is also a non-terminal. As we have formed rules with left and right-hand sides, divided by
+the '**::=**' operator, we've noticed that symbols are delimited by angle braces. And we've already accounted for the
+tokens that we recognize as being terminal symbols. So what about the other symbols? \<integer\> is a built in
+terminal. It is synonymous with the lexer token produced by integers in the lexing phase. Similarly, \<epsilon\> is a
+built in terminal. It is something that we are defining inside of the parser. But what does it represent? It
+is synonymous with an empty production. In the case of the second example, it is the production we reach when we run
+out of parentheses. 
 
 
 I would really like to go into as much detail on this topic as I can, but my explanation may be lacking. I would
@@ -408,11 +410,11 @@ identifying the left-hand side, we will look for the BNF symbol the delimits the
 
 In parsing the right hand side of a production rule, we will look for either another symbol, identified with angle
 braces, or a keyword/token. In the case that we need less-than or greater-than symbols to appear in our production
-rules, we will use a backslash to delimit them, such as \<. On finding whitespace, we will just advance to finding the
-next token, but if we encounter any symbol other than the beginning of a non-terminal symbol's token, then we will use
-this as a terminal and add it to our list of tokens for the lexer. Encountering a keyword, this will be added to the
-list of tokens and its token number will be added to the rule. So eventually we have rules that are determined by a
-right-hand side (RHS) non-terminal symbol and a left-hand side (LHS) of terminal and non-terminal symbols, all of
+rules, we will use a backslash to delimit them, such as \\<. On finding whitespace, we will just advance to finding
+the next token, but if we encounter any symbol other than the beginning of a non-terminal symbol's token, then we will
+use this as a terminal and add it to our list of tokens for the lexer. Encountering a keyword, this will be added to
+the list of tokens and its token number will be added to the rule. So eventually we have rules that are determined by
+a right-hand side (RHS) non-terminal symbol and a left-hand side (LHS) of terminal and non-terminal symbols, all of
 which are determined by identifying integer constands. We also have a table of keywords and symbol glyphs that we can
 provide to the lexer.
 
@@ -420,9 +422,9 @@ provide to the lexer.
 The process of building a parse table from the grammar is slightly more complex. In a psuedo-overview of the 
 algorithm, the process is as follows. First, nullable non-terminals must be identified. These are any of the cases
 where a non-terminal symbol may reduce to an <epsilon> production. In the above example, example 1, this is seen with
-the <S> token. Indeed, an empty stream of lexing tokens would be recognized by this parser. This is also a transitive
-property. If a non-terminal symbol reduces to another non-terminal symbol which is nullable, then it itself is a
-nullable non-terminal. Additionally, if a non-terminal symbol reduces to a production with any number of nullable
+the \<S\> token. Indeed, an empty stream of lexing tokens would be recognized by this parser. This is also a
+transitive property. If a non-terminal symbol reduces to another non-terminal symbol which is nullable, then it itself
+is a nullable non-terminal. Additionally, if a non-terminal symbol reduces to a production with any number of nullable
 non-terminal symbols, without any terminals, then it is a nullable non-terminal. These symbols are all identified
 first in a table.
 
@@ -436,18 +438,18 @@ productions are nullable.
 Next, a table of follow sets is generated, using the first set and set of nullable non-terminals as references. The
 follow set or FOLLOW(a) represents the possible terminal tokens that may appear after a production. The LR(1)
 algorithm uses a look-a-head of one symbol when parsing, so this helps the parser determine which state to transition
-to next. In the case of the root or base production, the follow set will include <$>. For other productions, it will
+to next. In the case of the root or base production, the follow set will include \<$\>. For other productions, it will
 include the set of terminals that may come after that production in any context it might be found in this given
 grammar.
 
 
-With these sets generated, the cannonical collection is the penultimate set to be constructed. Using a pair of
-operations known as the Goto set and the Closure of a set, the canonicla collection is formed by repeatedly adding
+With these sets generated, the canonical collection is the penultimate set to be constructed. Using a pair of
+operations known as the Goto set and the Closure of a set, the canonical collection is formed by repeatedly adding
 LR items to a collection and using these item sets to form new item sets, until nothing more can be added to the
-collection. Each item set in the cannonical collection represents one enumerated state in the final parser. 
+collection. Each item set in the canonical collection represents one enumerated state in the final parser. 
 
 
-Finally, the parse table itself is constructed using the cannonical collection and our original grammar rules.
+Finally, the parse table itself is constructed using the canonical collection and our original grammar rules.
 Using the Goto sets of each item set from the canonical collection, and the lookahead token from each item in the
 item set, a table of shift and reduce actions is built. This yields a Goto table and an Action table, the former of
 which determines state transitions from one parser state to another given a non-terminal symbol, and the latter
@@ -504,6 +506,7 @@ In any case, this is where the core of the language's work will be carried out. 
 dispatched by production id, and each production will handle its workload and process child productions as needed.
 The interpreter is aided by a virtual environment, or a runtime state and context, that it can use to track variables,
 procedures, function scopes, closures, and dynamic variables.
+
 
 The runtime itself is deceptively symbol. In general, all computation is stored in a single global variable (a very
 poor design up-front). This expression, gLastExpression, represents the value from the last operation or function

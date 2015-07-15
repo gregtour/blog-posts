@@ -682,13 +682,14 @@ call. Something like an addition operation will evaluate its left-hand side, sto
 evaluate the right-hand side, store the result in a temporary value, and then add the two results and store them in
 this gLastExpression register. Working in this fashion allows using return values for error codes, especially when
 not all productions return an expression, per se. A good example would be function parameters in a function
-declaration, compared to arguments in a function call.
+declaration, compared to arguments in a function call. Working in this fashion, the data we need from performing simple
+computations is automatically stored on the stack. Our more complex storage requirements will be met by the heap.
 
 
 Because of how we have arranged everything, it would be trivial for us to take this language and turn it into
 something else completely. With a few tweaks to our parser grammar, we could have a programming language with the
 exact same functionality that looks like C. We might call it JavaScript. Additionally, with some additions to the
-lexer, we might begin to enforce rules on indentation. Then our language could become like Python.
+lexer, we might begin to enforce rules on indentation. Then our language would become like Python.
 
 
 One of the great benefits to setting up our experiment this way is that it gives us complete flexibility. Earlier it

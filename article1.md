@@ -55,7 +55,8 @@ type information.
 
 Additional examples of dynamically typed languages besides JavaScript include Python, Ruby, Lua, Scheme and Lisp, and
 a number of others. Aside from the style of syntax and the degree of expressiveness, these programming languages are
-largely similar because of their type system. So called dynamically typed languages are often referred to as duck-typed or duck languages.
+largely similar because of their type system. So called dynamically typed languages are often referred to as duck-typed
+ or duck languages.
 
 
 Adopting many of these identifying features, and really as an exercise in constructing a language from basic parts, we
@@ -96,7 +97,9 @@ basic language for the common programmer.
 To find a root concept we can work from, let's begin with statements. There are statements that form operations. Given
 two values, add them together and assign the result. If an expression is true, execute a block of statements. Evaluate
 expressions and then make a procedure call with arguments. Et cetera. A block of statements will be described in terms
-of a statement list. Given a function declaration, a kind of statement, there is a name for the function, a list of parameter names, and a list of statements making up the body. An If/Else statement has a similar nature. It is a statement that contains additional statements.
+of a statement list. Given a function declaration, a kind of statement, there is a name for the function, a list of 
+parameter names, and a list of statements making up the body. An If/Else statement has a similar nature. It is a 
+statement that contains additional statements.
 
 
 We won't put any limitations on the placement of these. Functions can be defined inside of functions. In this case
@@ -254,7 +257,8 @@ certain characters to follow each other that form different tokens.
 
 Let's assume that we encounter a character from the alphabet. Then we could be looking at an identifier (something we
 use in the program to label a variable, procedure, or field) or a keyword. Following the conventions for naming 
-identifiers in our language, we will allow anything that starts with a letter and continues with any combination of letters, numbers, or underscores to name a variable. So we will continue scanning until we reach a character that does
+identifiers in our language, we will allow anything that starts with a letter and continues with any combination of 
+letters, numbers, or underscores to name a variable. So we will continue scanning until we reach a character that does
 not match or until we reach the end of the input; At this point we will either add an identifier or a keyword to our
 list of lexemes. We will have to check our list of keywords to see if this identifier is in fact a keyword. In that
 case, our lexer emits a 'token' instead and finds the right token constant for this keyword, here its index in our
@@ -299,6 +303,10 @@ buffers. Our token stream will then be passed on to our parser to generate an ab
 
 
 #### Part 5: The Parser
+
+The legendary green and red dragon books, by Aho and Ulman and Aho, Sethi, and Ulman.
+
+![The Green Dragon Book](green.jpg?raw=true "Green") ![The Red Dragon Book](red.jpg?raw=true "Red")
 
 We cannot yet talk about the parser until we talk about parser generators. Here I should mention that in our quest to
 find the most bendable way of going about doing things, we may be taking some extra-steps. As I said before, an
@@ -453,7 +461,8 @@ item set, a table of shift and reduce actions is built. This yields a Goto table
 which determines state transitions from one parser state to another given a non-terminal symbol, and the latter
 of which determines shift, reduce, or accept actions for the parser given the state and terminal symbol on top
 from the program input. The accept action indicates that the parsing operation is complete. If the parser fails to
-create a matching syntax tree from the source because it does not recognize the language, then a number of different errors may occur which prevent the source from being accepted. 
+create a matching syntax tree from the source because it does not recognize the language, then a number of different 
+errors may occur which prevent the source from being accepted. 
 
 
 The parser itself starts from state zero and works from the token stream yielded by the lexer to provide input to the

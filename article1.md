@@ -512,7 +512,7 @@ provide to the lexer.
 
 The process of building a parse table from the grammar is slightly more complex. In a pseudo-overview of the 
 algorithm, the process is as follows. First, nullable non-terminals must be identified. These are any of the cases
-where a non-terminal symbol may reduce to an \<epsilon\> production. In the above example, example 1, this is seen with
+where a non-terminal symbol may reduce to an \<epsilon\> production. In the above example, example 2, this is seen with
 the \<S\> token. Indeed, an empty stream of lexing tokens would be recognized by this parser. This is also a
 transitive property. If a non-terminal symbol reduces to another non-terminal symbol which is nullable, then it itself
 is a nullable non-terminal. Additionally, if a non-terminal symbol reduces to a production with any number of nullable

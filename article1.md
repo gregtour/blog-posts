@@ -560,7 +560,7 @@ symbol. In this case, it identifies the tree leaf to be the program's root eleme
 
 
 Finally, when the accept action is reached, the parsing is complete. If another state is encountered, the stack is
-empty, or another unhandled error occurs, we can say the parse failed and provide the input token that it failed on.
+empty, or another unhandled error occurs, we can say that the parse failed and provide the input token that it failed on.
 Since we have line numbers for tokens, we can indicate which line the parsing failed on. And given a bit more
 knowledge of the parser, we can identify whether there was an error due to running out of input, because of a specific
 syntax error, or other special cases. And given the specific failed token/production we could easily provide
@@ -568,7 +568,7 @@ customized error messages that indicate what was wrong with the input source. Th
 
 
 With the abstract syntax tree in hand, a tree of productions that enumerate children, each of which at a root-level
-consist of tree nodes or lexer-token terminals, we are left to run our programming language's program.
+consist of tree nodes or lexer-token terminals, we are left to interpret our programming language's program.
 
 
 #### Part 6: The Interpreter

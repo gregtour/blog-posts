@@ -567,7 +567,7 @@ we already have from the nullable non-terminals set.
 Now for examples from the follow set. These sets require the FIRST set to generate, but they also must consider other
 tokens in a production rule. Building these sets involves looking at each production rule and seeing what tokens follow
 any possible symbols. In addition, the process is only complete when all possibilities have been considered. Since each
-symbol could be dependent on another symbols FIRST and FOLLOW sets, the algorithm really must be ran repeatedly until
+symbol could be dependent on another symbol's FIRST and FOLLOW sets, the algorithm really must be ran repeatedly until
 there are no more changes to the FOLLOW set.
 
 Here, let's look at the arithmetic language.
@@ -581,9 +581,10 @@ Here, let's look at the arithmetic language.
 In this case, we've added the end of file token. That's because any of these symbols can be the last symbol in our
 language. The only thing following that is our end of input. An expression can be followed by a '+' plus sign, we can
 identify that from our first rule. There's nothing else that can follow it because no other rule uses the \<expr\> symbol
-on the right-hand side (aside from our implicit rule, \<start\> ::= \<expr\> \<$\>). Next we look at the \<term\> symbol.
-In rule #2, \<term\> is followed by a '*' multiplication sign. Rule #3 says a \<term\> can be used anywhere an \<expr\>
-is, so \<term\>'s follow set must include \<expr\>'s follow set as a sub-set. The same goes for our \<factor\> symbol.
+on the right-hand side (aside from our implicit rule, **\<start\> ::= \<expr\> \<$\>**). Next we look at the \<term\>
+symbol. In rule #2, \<term\> is followed by a '*' multiplication sign. Rule #3 says a \<term\> can be used anywhere an
+\<expr\> is, so \<term\>'s follow set must include \<expr\>'s follow set as a sub-set. The same goes for our \<factor\>
+symbol.
 
 Now let's look at the balanced parentheses language.
 
@@ -593,8 +594,17 @@ Now let's look at the balanced parentheses language.
 
 It's clear from rule #1 that ')' should be in the follow set. It follows \<S\> right? And it's also clear from rules #0
 and #1 that \<$\> would be in the follow set again. But where does the '(' opening parentheses symbol come from? Consider
-rule #2 where \<S\> **::=** \<S\> \<S\>. As \<S\> follows \<S\>, all of the elements from the First set for \<S\> must be
+rule #2 where **\<S\> ::= \<S\> \<S\>**. As \<S\> follows \<S\>, all of the elements from the First set for \<S\> must be
 in the Follow set for \<S\>. So we add that opening parentheses sign.
+
+Note: things can get more complex when we have nullable non-terminal symbols sandwiched in the middle of a grammar rule.
+For a moment consider this imaginary rule **\<A\> ::= \<A\> \<B\> \<C\>**. When building \<A\>'s Follow set, of course we
+would start with the First set from \<B\>. But in the case that \<B\> can be null, we must remember to include the First
+set of \<C\>. To give an even more complex example, consider the imaginary rule **\<D\> ::= \<A\> \<B\> \<C\>**. Again we
+are trying to determine \<A\>'s Follow set. We would do the same as above, but now what if \<C\> is a nullable
+non-terminal as well? Then \<A\>'s Follow set must contain all of the elements of \<D\>'s Follow set. (The first imaginary
+rule is insufficient for this example as saying \<A\>'s Follow set must contain the elements of \<A\>'s Follow set really
+tells us nothing.)
 
 
 ###### The Canonical Collection of LR(1) Item Sets

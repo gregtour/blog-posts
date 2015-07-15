@@ -253,24 +253,25 @@ compiling and other complexities which are best addressed in section II of this 
 
 Reasons supporting my decision to use C are chiefly that:
 
-<ul>
-<li> It is portable. A program written in C can be deployed on virtually any operating system. It is easy to
+
+* It is portable. A program written in C can be deployed on virtually any operating system. It is easy to
 compile for any device and can be executed on almost any microprocessor. Especially when this code is written with the
 standards in mind. I would also choose to avoid any new features in the language to maximize compatibility.
 
-<li> It is low-level. Without delving into assembly and machine code itself, C represents a close barrier to the target
+* It is low-level. Without delving into assembly and machine code itself, C represents a close barrier to the target
 machine itself. Not knowing what CPU our code will execute on or the exact layout of registers, we want to be aware of
 what sort of instructions will be executed and how our program will be laid out in memory.
 
-<li> It is not garbage collected. While this point can be debated, the purpose of this project is in ways to create
+* It is not garbage collected. While this point can be debated, the purpose of this project is in ways to create
 something new. So, creating a new language with higher level features, it is easier to feel a sense of accomplishment
 when we are working on features we didn't have from the start. This also helps us to have control over the runtime for
 our final interpreter, as we are being dealt the responsibility of memory management ourselves.
 
-<li> It's difficult. This hardly qualifies as a reason. I would say that one reason would be '_because it is fast_,' but
+
+* It's difficult. This hardly qualifies as a reason. I would say that one reason would be '_because it is fast_,' but
 knowing how the process of writing has gone, it is neither fast to implement nor necessarily the fastest resulting
 code. But true to form, this exercise will be a challenge, so it might as well be a good one.
-</ul>
+
 
 Now this doesn't particularly qualify as a language concern, but as an additional challenge, the project is being
 built from the ground-up, in a pulled-up-by-its-own-bootstraps kind of way. That means, as you see the parts of

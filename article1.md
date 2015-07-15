@@ -500,7 +500,7 @@ the next token, but if we encounter any symbol other than the beginning of a non
 use this as a terminal and add it to our list of tokens for the lexer. Encountering a keyword, this will be added to
 the list of tokens and its token number will be added to the rule. So eventually we have rules that are determined by
 a left-hand side (LHS) non-terminal symbol and a right-hand side (RHS) of terminal and non-terminal symbols, all of
-which are determined by identifying integer constands. We also have a table of keywords and symbol glyphs that we can
+which are determined by identifying integer constants. We also have a table of keywords and symbol glyphs that we can
 provide to the lexer.
 
 

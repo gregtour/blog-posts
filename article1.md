@@ -676,7 +676,7 @@ int InterpretNode(SYNTAX_TREE* node)
 ```
 
 
-The runtime itself is deceptively symbol. In general, all computation is stored in a single global variable (a very
+The runtime itself is deceptively simple. In general, all computation is stored in a single global variable (a very
 poor design up-front). This expression, gLastExpression, represents the value from the last operation or function
 call. Something like an addition operation will evaluate its left-hand side, store the result in a temporary value,
 evaluate the right-hand side, store the result in a temporary value, and then add the two results and store them in

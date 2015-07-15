@@ -474,7 +474,7 @@ I would really like to go into as much detail on this topic as I can, but my exp
 encourage any curious reader to gather as much information as he or she can on parsing techniques if interested.
 Alternatively, there are a number of ready made solutions for parser-generators out there that have been discussed
 before. This custom made parser generator has been split from the _Duck programming language_ project into its own
-branch, here: https://github.com/gregtour/parsergenerator for those looking for the original source code.
+branch, [available here](https://github.com/gregtour/parsergenerator), for those looking for the original source code.
 
 
 Our parser generator will load a context-free grammar as a ".cfg" file and will itself parse the production rules from

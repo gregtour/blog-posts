@@ -676,6 +676,34 @@ knowledge of the parser, we can identify whether there was an error due to runni
 syntax error, or other special cases. And given the specific failed token/production we could easily provide
 customized error messages that indicate what was wrong with the input source. These are all ancillary needs.
 
+As an example of what our resulting syntax tree will look like, let's look again at a simplified example. The grammar
+for our language deals with a number of different language constructs. We have if's/else's, functions, while loops,
+and for loops. Each of these statements must have some type of code to run, so we also must have assignment statements.
+Our loops and conditionals need conditions to evaluate, so we also require Boolean expressions. This necessitates a
+whole framework of expressions. 
+
+To support all the operations of math that we require, as well as logic, function composition, variable and array
+referencing, we will need to create a grammar for expressions. Including that entire description here might be
+excessive, so let's consider again just arithmetic and algebraic expressions. Let's assume that we have our
+operations set up for addition, multiplication, and modulus division as we mentioned before. Looking at our first
+example grammar, we can see how we might set up a hierarchy for orders of operations. In addition, we'll add
+parentheses as another requirement to maintain operator precedence.
+
+Given all of these structures, we may way to parse this given expression:
+
+> -1 * 2 + 3 mod 4
+
+As we declined to include negative numbers in the definition of our lexer, we'll also have to add negation to one of
+the operators in our programming language. After this sequence has passed through the lexer, it will be given to the
+parser. The parser will recognize it as a statement that simply reads as a standalone expression. The expression is
+made up of terms and factors and then generates an abstract syntax tree. Initially, this tree will contain a number of
+branches that connect nodes in trivial ways. As we said before, sometimes an expression is just a term, and sometimes
+a term is just a factor. To avoid operating on trivial constructions, or at least for viewing what this syntax tree
+looks like, we will want to eliminate trivially simple productions. This is easily handled by making a list of all of
+the trivial productions. Then let's view what the syntax tree for this program looks like.
+
+![Expression Syntax](diagram.png?raw=true "Expression Syntax Tree")
+
 
 With the abstract syntax tree in hand, a tree of productions that enumerate children, each of which at a root-level
 consist of tree nodes or lexer-token terminals, we are left to interpret our programming language's program.

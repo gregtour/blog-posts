@@ -62,10 +62,10 @@ on the topic of programming language design before embarking on this journey. Wi
 
 
 At this point it might be easy to scrabble together a document of syntactic expressions, beginner how-to tutorials,
-wikis, or grammar guides as an explanation of the language and drop the topic altogether, moving on to more productive
-tasks. Sometimes it seems like the design of a language, down to its true grammar, is something more for linernotes on
+Wikis, or grammar guides as an explanation of the language and drop the topic altogether, moving on to more productive
+tasks. Sometimes it seems like the design of a language, down to its true grammar, is something more for liner-notes on
 a reference manual than something that exists that has been written, crafted, or changed over time. The purpose of
-this explanation is not to suggest that your programming language should be chiseled into stone and that that is how
+this explanation is not to suggest that your programming language should be chiselled into stone and that that is how
 great concepts come to fruition. Instead, true to the nature of our task, we will at every step of the way look at how
 things can be changed, expanded, and made to evolve over time. What might be suitable for one task is not the solution
 to every problem, and having a way to change things or reuse our efforts is always good.
@@ -73,7 +73,7 @@ to every problem, and having a way to change things or reuse our efforts is alwa
 
 With that in mind, we will sort of gloss over what the fundamental mechanics of the _Duck language_ are at the atomic
 level. Instead, we will explore what the essence is. We want to discover the intention of the language itself.
-If we can get into the mind, the feng shui or the essential attitudes of the programming language, that would be
+If we can get into the mind, the feng-shui, or the essential attitudes of the programming language, that would be
 enough. Still, programming languages are systems that we use to express ideas. And for any manner of communication to
 be useful, we need to have some common ground.
 
@@ -85,7 +85,7 @@ basic language for the common programmer.
 
 To find a root concept we can work from, let's begin with statements. There are statements that form operations. Given
 two values, add them together and assign the result. If an expression is true, execute a block of statements. Evaluate
-expressions and then make a procedure call with arguments. Et cetera. A block of statements will be described in terms
+expressions and then make a procedure call with arguments. Etcetera. A block of statements will be described in terms
 of a statement list. Given a function declaration, a kind of statement, there is a name for the function, a list of 
 parameter names, and a list of statements making up the body. An If/Else statement has a similar nature. It is a 
 statement that contains additional statements.
@@ -219,7 +219,7 @@ language.
 Roughly this is a description of the language we intend to create. 
 
 
-#### Part 3: The Setup
+#### Part 3: The Set Up
 
 
 A casual reader following along might not be interested in developing their own language, as of this moment. They
@@ -504,7 +504,7 @@ which are determined by identifying integer constants. We also have a table of k
 provide to the lexer.
 
 
-The process of building a parse table from the grammar is slightly more complex. In a psuedo-overview of the 
+The process of building a parse table from the grammar is slightly more complex. In a pseudo-overview of the 
 algorithm, the process is as follows. First, nullable non-terminals must be identified. These are any of the cases
 where a non-terminal symbol may reduce to an <epsilon> production. In the above example, example 1, this is seen with
 the \<S\> token. Indeed, an empty stream of lexing tokens would be recognized by this parser. This is also a
@@ -688,7 +688,7 @@ declaration, compared to arguments in a function call.
 Because of how we have arranged everything, it would be trivial for us to take this language and turn it into
 something else completely. With a few tweaks to our parser grammar, we could have a programming language with the
 exact same functionality that looks like C. We might call it JavaScript. Additionally, with some additions to the
-lexer, we might begin to enforce rules on indentation. Then our langauge could become like Python.
+lexer, we might begin to enforce rules on indentation. Then our language could become like Python.
 
 
 One of the great benefits to setting up our experiment this way is that it gives us complete flexibility. Earlier it
@@ -717,3 +717,5 @@ applications.
 #### Part 9: The Garbage Collector
 
 #### End Notes
+
+

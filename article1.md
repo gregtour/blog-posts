@@ -525,6 +525,9 @@ include the set of terminals that may come after that production in any context 
 grammar.
 
 
+... Include an example of the nullable non-terminals, FIRST, and FOLLOW sets for each example grammar ...
+
+
 With these sets generated, the canonical collection is the penultimate set to be constructed. Using a pair of
 operations known as the Goto set and the Closure of a set, the canonical collection is formed by repeatedly adding
 LR items to a collection and using these item sets to form new item sets, until nothing more can be added to the
@@ -577,6 +580,56 @@ question becomes, what is the most effective way to operate on this data? Althou
 solution, my straightforward answer was to use code generation from the programming language's grammar itself.
 
 
+Each production is converted into a C function that is called with the production's leaf node from the abstract syntax
+tree. Each of these production calls is dispatched from a table that associates production numbers with the correct
+C function. These are called when a function decides to call InterpretNode on a child production. Example:
+
+```C
+/* 1. <program> -> <stmt list> */
+int ReduceProgram(SYNTAX_TREE* node)
+{
+    SYNTAX_TREE* stmt_list1 = node->children[0];
+
+    int error = 0;
+    error = InterpretNode(stmt_list1);
+
+    return error;
+}
+```
+
+This is the automatically generated production for our most basic grammar rule. Since this rule is fully recursive,
+there is really nothing for us to do. A better example that might show how the internal logic is supposed to work
+might be a statement or instruction that must do some work.
+
+
+This grammar production for an expression rule tests equality.
+
+```C
+/* 74. <comparison> -> <comparison> == <arithmetic> */
+int ReduceComparisonA(SYNTAX_TREE* node)
+{
+    SYNTAX_TREE* comparison1 = node->children[0];
+    SYNTAX_TREE* arithmetic1 = node->children[2];
+
+    VALUE comparison;
+    VALUE arithmetic;
+
+    int error = 0;
+    error = InterpretNode(comparison1);
+    comparison = gLastExpression;
+    if (error) return error;
+    error = InterpretNode(arithmetic1);
+    arithmetic = gLastExpression;
+    if (error) return error;
+
+    /* EQUAL */
+    gLastExpression = CompareEquality(comparison, arithmetic);
+    
+    return error;
+}
+```
+
+
 Working from the grammar directly poses its own limitations. Changing specific language features or simply tweaking
 the syntax may require re-laying out all of the work that has been done in crafting an interpreter. Some ways to
 lessen this burden might be to generate special constants and tokens based on the symbols in rules and use them to
@@ -590,6 +643,35 @@ dispatched by production id, and each production will handle its workload and pr
 The interpreter is aided by a virtual environment, or a runtime state and context, that it can use to track variables,
 procedures, function scopes, closures, and dynamic variables.
 
+The main dispatch is
+```C
+/* reduce one node */
+int InterpretNode(SYNTAX_TREE* node)
+{
+    if (node == NULL || node->production == 0) {
+        printf("Null production.\n");
+        return 1;
+    }
+
+    line_error = node->line;
+    failed_production = node;
+
+    switch (node->production)
+    {
+        case 0x01: return ReduceProgram(node);
+        case 0x02: return ReduceStmtListA(node);
+        case 0x03: return ReduceStmtListB(node);
+        case 0x04: return ReduceIdentifierListA(node);
+        case 0x05: return ReduceIdentifierListB(node);
+        case 0x06: return ReduceOptEndlA(node);
+        case 0x07: return ReduceOptEndlB(node);
+        case 0x08: return ReduceStmtA(node);
+        case 0x09: return ReduceStmtB(node);
+        case 0x0A: return ReduceStmtC(node);
+
+        ...
+```
+
 
 The runtime itself is deceptively symbol. In general, all computation is stored in a single global variable (a very
 poor design up-front). This expression, gLastExpression, represents the value from the last operation or function
@@ -598,6 +680,31 @@ evaluate the right-hand side, store the result in a temporary value, and then ad
 this gLastExpression register. Working in this fashion allows using return values for error codes, especially when
 not all productions return an expression, per se. A good example would be function parameters in a function
 declaration, compared to arguments in a function call.
+
+
+Because of how we have arranged everything, it would be trivial for us to take this language and turn it into
+something else completely. With a few tweaks to our parser grammar, we could have a programming language with the
+exact same functionality that looks like C. We might call it JavaScript. Additionally, with some additions to the
+lexer, we might begin to enforce rules on indentation. Then our langauge could become like Python.
+
+
+One of the great benefits to setting up our experiment this way is that it gives us complete flexibility. Earlier it
+was stated that dynamic languages are interpreted and static languages are compiled. This isn't always true.
+Furthermore, we can take a static language and relax the rules around type safety, essentially skipping over the step
+of type checking and passing that on as a runtime concern, and we could craft an interpreter around a familiar
+language that we know.
+
+
+It terms of our parser generator's power, we are able to parse Java programs from the earliest specification. This is
+because it was designed to be an LR(1) grammar, or completely deterministic. Later features have changed this, like
+C and C++ which are also not strictly context free. These are challenges but they are not insurmountable and generally
+require a few extra stages or steps to be added to our lexing and parsing pipeline. Additions like a pre-processor and
+post-processor mainly. 
+
+
+So we can already see how we might make a language like Cscript, that can run C programs itself by executing them in
+an interpreter. This just shows how interesting programming language design can be, before even looking at practical
+applications.
 
 
 #### Part 7: The Library

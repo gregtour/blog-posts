@@ -55,12 +55,11 @@ type information.
 
 Additional examples of dynamically typed languages besides JavaScript include Python, Ruby, Lua, Scheme and Lisp, and
 a number of others. Aside from the style of syntax and the degree of expressiveness, these programming languages are
-largely similar because of their type system. So called dynamically typed languages are often referred to as duck-typed
-or 'Duck' languages.
+largely similar because of their type system. So called dynamically typed languages are often referred to as duck-typed or duck languages.
 
 
 Adopting many of these identifying features, and really as an exercise in constructing a language from basic parts, we
-will build the Duck programming language from the ground up. We will explore this process without regard to its 
+will build the _Duck programming language_ from the ground up. We will explore this process without regard to its 
 pragmatism or practicality. Indeed, any ideas of utility will come only after we have completed the process.
 
 
@@ -82,7 +81,7 @@ things can be changed, expanded, and made to evolve over time. What might be sui
 to every problem, and having a way to change things or reuse our efforts is always good.
 
 
-With that in mind, we will sort of gloss over what the fundamental mechanics of the 'Duck' language are at the atomic
+With that in mind, we will sort of gloss over what the fundamental mechanics of the _Duck language_ are at the atomic
 level. Instead, we will explore what the essence is. We want to discover the intention of the language itself.
 If we can get into the mind, the feng shui or the essential attitudes of the programming language, that would be
 enough. Still, programming languages are systems that we use to express ideas. And for any manner of communication to
@@ -145,9 +144,10 @@ implement their logic.
 
 
 A casual reader following along might not be interested in developing their own language, as of this moment. They
-might be more interested in the mechanics involved. As a rather extreme exercise, I invite anyone to attempt to create
-their own "duck" compatible runtime environment. That being said, I am about to outline the process and tools that I
-used to create this language, even though I recognize there are multiple ways to go about the process. 
+might be more interested in the mechanics involved. As a rather elaborate exercise, I invite anyone to attempt to
+create their own _duck language_ compatible runtime environment. That being said, I am about to outline the process
+and tools that I used to create this language, even though I recognize there are multiple ways to go about the
+process. 
 
 
 For example, I chose to write everything in the C programming language. This is really a more difficult task than it
@@ -168,7 +168,7 @@ entirely new language.
 
 
 I will note that there is one way that implementing this dynamic language in an interpreted or scripting language
-might be helpful, and that would be in the case of cross-compiling. I.e. having our 'duck' code reduced to some other
+might be helpful, and that would be in the case of cross-compiling. I.e. having our _duck code_ reduced to some other
 language, like JavaScript or Python, before being executed. That would be fine but then we are dealing with code 
 compiling and other complexities which are best addressed in section II of this series.
 
@@ -191,11 +191,9 @@ when we are working on features we didn't have from the start. This also helps u
 our final interpreter, as we are being dealt the responsibility of memory management ourselves.
 
 
-D) It's difficult. This hardly qualifies as a reason. I would say that one reason would be 'because it is fast,' but
-knowing the internals of some parts of the 'duck' language's stack I know that's hardly the case. Because of the added
-complexity of using some better data structures (in terms of code writing), certain elements of table generation are
-extremely slow and at times redundant. However, this does not carry over into the runtime (hopefully).
-
+D) It's difficult. This hardly qualifies as a reason. I would say that one reason would be '_because it is fast_,' but
+knowing how the process of writing has gone, it is neither fast to implement nor necessarily the fastest resulting
+code. But true to form, this exercise will be a challenge, so it might as well be a good one.
 
 Now this doesn't particularly qualify as a language concern, but as an additional challenge, the project is being
 built from the ground-up, in a pulled-up-by-its-own-bootstraps kind of way. That means, as you see the parts of
@@ -231,9 +229,9 @@ number the token appears on in the source file.
 
 Upon taking a source file as input, the lexer will create a new buffer and remove redundant whitespace, single line
 comments, and multi-line comments. Successive whitespace characters will be replaced with a single space, unless that
-stream includes a newline, in which case a newline will be used. This process is used to 'strip clean' the source file
-until we are dealing with program source directly. Now we will work character by character to isolate and identify the
-tokens that make up 'Duck' source code.
+stream includes a newline, in which case a newline will be used. This process is used to '_strip clean_' the source
+file until we are dealing with program source directly. Now we will work character by character to isolate and
+identify the tokens that make up _Duck source code_.
 
 
 At this point, we already have tables of keywords and symbols to begin with, and if we don't, it is something that we
@@ -308,7 +306,7 @@ enterprising programmer might start from the outset programming in assembly. Whi
 that route, we have to look at the other more direct paths that we are giving up. This is in some ways a domain
 specific language that we are constructing. If we were really in-tune with what we wanted our resulting programming
 language to look like and how it should behave, we might be able to wrap the parsing and lexing steps all in to
-one. Or in any case, we could forego 'generating' a parser and start writing one by hand.
+one. Or in any case, we could forego generating a parser and start writing one by hand.
 
 This would be in lieu of formalizing the language's grammar. Instead, we would create our own specially crafted loop
 that would process each kind of statement, and in-turn would match up symbols. This describes what might be called a
@@ -381,7 +379,7 @@ more symbols or tokens in our program. It itself is a terminal production.
 
 Non-terminals are symbols that we defined in the grammar itself. \<expr\>, \<term\> and \<factor\> are all
 non-terminal symbols. \<S\> is also a non-terminal. As we have formed rules with left and right-hand sides, divided by
-the '**::=**' operator, we've noticed that symbols are delimited by angle braces. And we've already accounted for the
+the **::=** operator, we've noticed that symbols are delimited by angle braces. And we've already accounted for the
 tokens that we recognize as being terminal symbols. So what about the other symbols? \<integer\> is a built in
 terminal. It is synonymous with the lexer token produced by integers in the lexing phase. Similarly, \<epsilon\> is a
 built in terminal. It is something that we are defining inside of the parser. But what does it represent? It
@@ -392,7 +390,7 @@ out of parentheses.
 I would really like to go into as much detail on this topic as I can, but my explanation may be lacking. I would
 encourage any curious reader to gather as much information as he or she can on parsing techniques if interested.
 Alternatively, there are a number of ready made solutions for parser-generators out there that have been discussed
-before. This custom made parser generator has been split from the Duck programming language project into its own
+before. This custom made parser generator has been split from the _Duck programming language_ project into its own
 branch, here: https://github.com/gregtour/parsergenerator for those looking for the original source code.
 
 

@@ -304,10 +304,6 @@ buffers. Our token stream will then be passed on to our parser to generate an ab
 
 #### Part 5: The Parser
 
-The legendary green and red dragon books, by Aho and Ulman and Aho, Sethi, and Ulman.
-
-![The Green Dragon Book](green.jpg?raw=true "Green") ![The Red Dragon Book](red.jpg?raw=true "Red")
-
 We cannot yet talk about the parser until we talk about parser generators. Here I should mention that in our quest to
 find the most bendable way of going about doing things, we may be taking some extra-steps. As I said before, an
 enterprising programmer might start from the outset programming in assembly. While we have made our choices not to go
@@ -327,6 +323,10 @@ I would also like to note that, as one method of by-hand parsing, the top-down r
 an area of do-it-yourself parsing techniques that might very well be able to parse any grammar. From a computational
 theory perspective, a function can be written in any sufficiently suitable language to recognize any deterministic
 language. But we are looking for more of a sure footed answer than that.
+
+The legendary green and red dragon books, by Aho and Ulman and Aho, Sethi, and Ulman.
+
+![The Green Dragon Book](green.jpg?raw=true "Green") ![The Red Dragon Book](red.jpg?raw=true "Red")
 
 So we turn to the Dragon Book for answers. I was unable to find a copy of the green dragon book, which is maybe the
 oldest of yore, "Principles of Compiler Design," but I did have a copy on hand of "Compilers: Principles, Techniques,

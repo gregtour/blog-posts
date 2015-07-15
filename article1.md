@@ -699,11 +699,11 @@ of type checking and passing that on as a runtime concern, and we could craft an
 language that we know.
 
 
-It terms of our parser generator's power, we are able to parse Java programs from the earliest specification. This is
-because it was designed to be an LR(1) grammar, or completely deterministic. Later features have changed this, like
-C and C++ which are also not strictly context free. These are challenges but they are not insurmountable and generally
-require a few extra stages or steps to be added to our lexing and parsing pipeline. Additions like a pre-processor and
-post-processor mainly. 
+In terms of our parser generator's power, we are able to parse early-Java programs, stuff from version 1.0. This is
+because the language was originally designed to be an LR(1) grammar, or completely deterministic. Later features have
+changed this, like C and C++ which are also not strictly context free. These are challenges but they are not
+insurmountable and generally require a few extra stages or steps to be added to our lexing and parsing pipeline. Additions
+like a pre-processor and post-processor mainly would help us with this task. 
 
 
 So we can already see how we might make a language like Cscript, that can run C programs itself by executing them in

@@ -1,5 +1,7 @@
 ### Designing a Programming Language: I
-> Designing a language and building an interpreter from concept to evolution.
+
+> ![Duck-logo](small.png?raw=true "Duck programming language logo")  Designing a language and building an interpreter
+from concept to evolution.
 
 
 
@@ -63,8 +65,8 @@ on the topic of programming language design before embarking on this journey. Wi
 
 At this point it might be easy to scrabble together a document of syntactic expressions, beginner how-to tutorials,
 Wikis, or grammar guides as an explanation of the language and drop the topic altogether, moving on to more productive
-tasks. Sometimes it seems like the design of a language, down to its true grammar, is something more for liner-notes on
-a reference manual than something that exists that has been written, crafted, or changed over time. The purpose of
+tasks. Sometimes it seems like the design of a language, down to its true grammar, is something more for liner-notes
+on a reference manual than something that exists that has been written, crafted, or changed over time. The purpose of
 this explanation is not to suggest that your programming language should be chiselled into stone and that that is how
 great concepts come to fruition. Instead, true to the nature of our task, we will at every step of the way look at how
 things can be changed, expanded, and made to evolve over time. What might be suitable for one task is not the solution
@@ -500,7 +502,7 @@ identifying the left-hand side, we will look for the BNF symbol that divides the
 
 In parsing the right hand side of a production rule, we will look for either another symbol, identified with angle
 braces, or a keyword/token. In the case that we need less-than or greater-than symbols to appear in our production
-rules, we will use a backslash to delimit them, such as \\<. On finding whitespace, we will just advance to finding
+rules, we will use a backslash to delimit them, such as "\\<". On finding whitespace, we will just advance to finding
 the next token, but if we encounter any symbol other than the beginning of a non-terminal symbol's token, then we will
 use this as a terminal and add it to our list of tokens for the lexer. Encountering a keyword, this will be added to
 the list of tokens and its token number will be added to the rule. So eventually we have rules that are determined by
@@ -512,8 +514,8 @@ provide to the lexer.
 
 The process of building a parse table from the grammar is slightly more complex. In a pseudo-overview of the 
 algorithm, the process is as follows. First, nullable non-terminals must be identified. These are any of the cases
-where a non-terminal symbol may reduce to an \<epsilon\> production. In the above example, example 2, this is seen with
-the \<S\> token. Indeed, an empty stream of lexing tokens would be recognized by this parser. This is also a
+where a non-terminal symbol may reduce to an \<epsilon\> production. In the above example, example 2, this is seen
+with the \<S\> token. Indeed, an empty stream of lexing tokens would be recognized by this parser. This is also a
 transitive property. If a non-terminal symbol reduces to another non-terminal symbol which is nullable, then it itself
 is a nullable non-terminal. Additionally, if a non-terminal symbol reduces to a production with any number of nullable
 non-terminal symbols, without any terminals, then it is a nullable non-terminal. These symbols are all identified
@@ -540,12 +542,13 @@ complex enough that it would take a fair bit more work. In any case, I'm relativ
 logic in code.
 
 
-To help in understanding the concept of the FIRST(a) set, I will give examples for each of the (small) sample grammars.
+To help in understanding the concept of the FIRST(a) set, I will give examples for each of the (small) sample
+grammars.
 
 An example from the arithmetic language.
 
 | Symbol | First Set |
-|--------|-----------|
+|--------|----------:|
 |\<expr\> | integer |
 |\<term\> | integer |
 |\<factor\> | integer |
@@ -555,7 +558,7 @@ Here we see that, each of these productions must begin with an integer token.
 Now consider the parentheses language.
 
 | Symbol | First Set |
-|--------|-----------|
+|--------|----------:|
 | \<S\> | ( |
 
 This one is even simpler. The only token that begins the \<S\> symbol's production in our grammar is the open 
@@ -566,46 +569,46 @@ terminal token.
 ###### Follow Set Examples
 
 Now for examples from the follow set. These sets require the FIRST set to generate, but they also must consider other
-tokens in a production rule. Building these sets involves looking at each production rule and seeing what tokens follow
-any possible symbols. In addition, the process is only complete when all possibilities have been considered. Since each
-symbol could be dependent on another symbol's FIRST and FOLLOW sets, the algorithm really must be ran repeatedly until
-there are no more changes to the FOLLOW set.
+tokens in a production rule. Building these sets involves looking at each production rule and seeing what tokens
+follow any possible symbols. In addition, the process is only complete when all possibilities have been considered.
+Since each symbol could be dependent on another symbol's FIRST and FOLLOW sets, the algorithm really must be ran
+repeatedly until there are no more changes to the FOLLOW set.
 
 Here, let's look at the arithmetic language.
 
 | Symbol | Follow Set |
-|--------|-----------|
+|--------|----------:|
 |\<expr\> | +, \<$\> |
 |\<term\> | *, +, \<$\> |
 |\<factor\> | *, +, \<$\> |
 
 In this case, we've added the end of file token. That's because any of these symbols can be the last symbol in our
 language. The only thing following that is our end of input. An expression can be followed by a '+' plus sign, we can
-identify that from our first rule. There's nothing else that can follow it because no other rule uses the \<expr\> symbol
-on the right-hand side (aside from our implicit rule, **\<start\> ::= \<expr\> \<$\>**). Next we look at the \<term\>
-symbol. In rule #2, \<term\> is followed by a '*' multiplication sign. Rule #3 says a \<term\> can be used anywhere an
-\<expr\> is, so \<term\>'s follow set must include \<expr\>'s follow set as a sub-set. The same goes for our \<factor\>
-symbol.
+identify that from our first rule. There's nothing else that can follow it because no other rule uses the \<expr\>
+symbol on the right-hand side (aside from our implicit rule, *\<start\> ::= \<expr\> \<$\>*). Next we look at the
+\<term\> symbol. In rule #2, \<term\> is followed by a '*' multiplication sign. Rule #3 says a \<term\> can be used
+anywhere an \<expr\> is, so \<term\>'s follow set must include \<expr\>'s follow set as a sub-set. The same goes for
+our \<factor\> symbol.
 
 Now let's look at the balanced parentheses language.
 
 | Symbol | Follow Set |
-|--------|------------|
+|--------|-----------:|
 |\<S\> | (, ), \<$\> |
 
-It's clear from rule #1 that ')' should be in the follow set. It follows \<S\> right? And it's also clear from rules #0
-and #1 that \<$\> would be in the follow set again. But where does the '(' opening parentheses symbol come from? Consider
-rule #2 where **\<S\> ::= \<S\> \<S\>**. As \<S\> follows \<S\>, all of the elements from the First set for \<S\> must be
-in the Follow set for \<S\>. So we add that opening parentheses sign.
+It's clear from rule #1 that ')' should be in the follow set. It follows \<S\> right? And it's also clear from rules
+#0 and #1 that \<$\> would be in the follow set again. But where does the '(' opening parentheses symbol come from?
+Consider rule #2 where *\<S\> ::= \<S\> \<S\>*. As \<S\> follows \<S\>, all of the elements from the First set for
+\<S\> must be in the Follow set for \<S\>. So we add that opening parentheses sign.
 
-Note: things can get more complex when we have nullable non-terminal symbols sandwiched in the middle of a grammar rule.
-For a moment consider this imaginary rule **\<A\> ::= \<A\> \<B\> \<C\>**. When building \<A\>'s Follow set, of course we
-would start with the First set from \<B\>. But in the case that \<B\> can be null, we must remember to include the First
-set of \<C\>. To give an even more complex example, consider the imaginary rule **\<D\> ::= \<A\> \<B\> \<C\>**. Again we
-are trying to determine \<A\>'s Follow set. We would do the same as above, but now what if \<C\> is a nullable
-non-terminal as well? Then \<A\>'s Follow set must contain all of the elements of \<D\>'s Follow set. (The first imaginary
-rule is insufficient for this example as saying \<A\>'s Follow set must contain the elements of \<A\>'s Follow set really
-tells us nothing.)
+Note: things can get more complex when we have nullable non-terminal symbols sandwiched in the middle of a grammar
+rule. For a moment consider this imaginary rule *\<A\> ::= \<A\> \<B\> \<C\>*. When building \<A\>'s Follow set, of
+course we would start with the First set from \<B\>. But in the case that \<B\> can be null, we must remember to
+include the First set of \<C\>. To give an even more complex example, consider the imaginary rule *\<D\> ::= \<A\>
+\<B\> \<C\>*. Again we are trying to determine \<A\>'s Follow set. We would do the same as above, but now what if
+\<C\> is a nullable non-terminal as well? Then \<A\>'s Follow set must contain all of the elements of \<D\>'s Follow
+set. (The first imaginary rule is insufficient for this example as saying \<A\>'s Follow set must contain the elements
+of \<A\>'s Follow set really tells us nothing.)
 
 
 ###### The Canonical Collection of LR(1) Item Sets
@@ -647,13 +650,13 @@ int BuildLRParser(GRAMMAR_TABLE grammar,
 ```
 
 
-Again, this process starts with rules and building the First and Follow sets after finding nullable non-terminal symbols.
-Then the canonical collection is formed by taking LR items, which are productions paired with a parsing position. We write
-this as a dot in the middle of the production. This information is combined with a lookahead symbol, which provides 
-information about the next expected input. Starting from beginning of the root production with an end of file lookahead,
-the canonical collection builds an LR item set. The algorithm repeatedly advances the token and finds the closure of these
-items to expand the set. There are other sets that do not fit inside the closure of this item set, so the canonical
-collection is a collection built from these sets. 
+Again, this process starts with rules and building the First and Follow sets after finding nullable non-terminal
+symbols. Then the canonical collection is formed by taking LR items, which are productions paired with a parsing
+position. We write this as a dot in the middle of the production. This information is combined with a lookahead
+symbol, which provides information about the next expected input. Starting from beginning of the root production with
+an end of file lookahead, the canonical collection builds an LR item set. The algorithm repeatedly advances the token
+and finds the closure of these items to expand the set. There are other sets that do not fit inside the closure of
+this item set, so the canonical collection is a collection built from these sets. 
 
 
 ##### Stack-based Parsing
@@ -671,17 +674,17 @@ symbol. In this case, it identifies the tree leaf to be the program's root eleme
 
 
 Finally, when the accept action is reached, the parsing is complete. If another state is encountered, the stack is
-empty, or another unhandled error occurs, we can say that the parse failed and provide the input token that it failed on.
-Since we have line numbers for tokens, we can indicate which line the parsing failed on. And given a bit more
+empty, or another unhandled error occurs, we can say that the parse failed and provide the input token that it failed
+on. Since we have line numbers for tokens, we can indicate which line the parsing failed on. And given a bit more
 knowledge of the parser, we can identify whether there was an error due to running out of input, because of a specific
 syntax error, or other special cases. And given the specific failed token/production we could easily provide
 customized error messages that indicate what was wrong with the input source. These are all ancillary needs.
 
 As an example of what our resulting syntax tree will look like, let's look again at a simplified example. The grammar
 for our language deals with a number of different language constructs. We have if's/else's, functions, while loops,
-and for loops. Each of these statements must have some type of code to run, so we also must have assignment statements.
-Our loops and conditionals need conditions to evaluate, so we also require Boolean expressions. This necessitates a
-whole framework of expressions. 
+and for loops. Each of these statements must have some type of code to run, so we also must have assignment
+statements. Our loops and conditionals need conditions to evaluate, so we also require Boolean expressions. This
+necessitates a whole framework of expressions. 
 
 To support all the operations of math that we require, as well as logic, function composition, variable and array
 referencing, we will need to create a grammar for expressions. Including that entire description here might be
@@ -690,7 +693,7 @@ operations set up for addition, multiplication, and modulus division as we menti
 example grammar, we can see how we might set up a hierarchy for orders of operations. In addition, we'll add
 parentheses as another requirement to maintain operator precedence.
 
-Given all of these structures, we may way to parse this given expression:
+Given all of these structures, we may make way to parsing this given expression:
 
 > -1 * 2 + 3 mod 4
 
@@ -701,13 +704,14 @@ made up of terms and factors and then generates an abstract syntax tree. Initial
 branches that connect nodes in trivial ways. As we said before, sometimes an expression is just a term, and sometimes
 a term is just a factor. To avoid operating on trivial constructions, or at least for viewing what this syntax tree
 looks like, we will want to eliminate trivially simple productions. This is easily handled by making a list of all of
-the trivial productions. Then let's view what the syntax tree for this program looks like.
+the trivial productions. Then let's view what the syntax tree for this statement looks like.
 
 ![Expression Syntax](diagram.png?raw=true "Expression Syntax Tree")
 
 
 With the abstract syntax tree in hand, a tree of productions that enumerate children, each of which at a root-level
-consist of tree nodes or lexer-token terminals, we are left to interpret our programming language's program.
+consist of tree nodes or lexer-token terminals, we are left to interpret the abstract syntax of our programming
+language's programs.
 
 
 #### Part 6: The Interpreter
@@ -821,8 +825,9 @@ call. Something like an addition operation will evaluate its left-hand side, sto
 evaluate the right-hand side, store the result in a temporary value, and then add the two results and store them in
 this gLastExpression register. Working in this fashion allows using return values for error codes, especially when
 not all productions return an expression, per se. A good example would be function parameters in a function
-declaration, compared to arguments in a function call. Working in this fashion, the data we need from performing simple
-computations is automatically stored on the stack. Our more complex storage requirements will be met by the heap.
+declaration, compared to arguments in a function call. Working in this fashion, the data we need from performing
+simple computations is automatically stored on the stack. Our more complex storage requirements will be met by the
+heap.
 
 
 Because of how we have arranged everything, it would be trivial for us to take this language and turn it into
@@ -841,8 +846,8 @@ language that we know.
 In terms of our parser generator's power, we are able to parse early-Java programs, stuff from version 1.0. This is
 because the language was originally designed to be an LR(1) grammar, or completely deterministic. Later features have
 changed this, like C and C++ which are also not strictly context free. These are challenges but they are not
-insurmountable and generally require a few extra stages or steps to be added to our lexing and parsing pipeline. Additions
-like a pre-processor and post-processor mainly would help us with this task. 
+insurmountable and generally require a few extra stages or steps to be added to our lexing and parsing pipeline.
+Additions like a pre-processor and post-processor mainly would help us with this task. 
 
 
 So we can already see how we might make a language like Cscript, that can run C programs itself by executing them in

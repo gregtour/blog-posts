@@ -490,7 +490,7 @@ of the production, however use of spaces and other symbols is permissible, as lo
 symbol occurs, it is used with the exact same matching literal. Once we've identified the left hand side, we will
 generate a symbol identifier for it. This is a unique number that corresponds to this symbol. We will be building a
 table of symbols as we go, so if we encounter the same symbol again, we will use the same integer value. After
-identifying the left-hand side, we will look for the BNF symbol the delimits the production. 
+identifying the left-hand side, we will look for the BNF symbol that divides the production. 
 
 
 In parsing the right hand side of a production rule, we will look for either another symbol, identified with angle

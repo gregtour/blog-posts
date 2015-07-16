@@ -8,7 +8,7 @@ from concept to evolution.
 #### Part 1: The Premise
 
 Programming languages come in a variety of different paradigms. Even so, there tend to be two main camps along the 
-language front. There are static languages and there are dynamic languages. To avoid too much history and any sort of 
+language front. There are static languages and there are dynamic languages. To avoid too much history and any sort of
 in-depth analysis, this article will simplify things with a number of assumptions. One assumption we will make which 
 might not always hold true is that programs written in static languages are compiled to machine code, while 
 programs that are written in dynamic languages run in an interpreter. 
@@ -28,8 +28,9 @@ Dim text As String
 ```
 
 
-This would be the prototype for a static language. When variables are first declared, they must be paired with a type.
-In order to compare with a dynamically typed language, let us look at an example from ECMA script or JavaScript.
+This would be the prototype for a static language. When variables are first declared, they must be paired with a
+type. In order to compare with a dynamically typed language, let us look at an example from ECMA script or
+JavaScript.
 
 
 ```javascript
@@ -38,9 +39,9 @@ var text;
 ```
 
 
-In this example, no types are declared for these variables. The variable 'num1' could be used as any type by assigning
-any value to it. Additionally, the declaration step is wholly unnecessary. The way that values are stored includes the
-type information.
+In this example, no types are declared for these variables. The variable 'num1' could be used as any type by
+assigning any value to it. Additionally, the declaration step is wholly unnecessary. The way that values are stored
+includes the type information.
 
 
 Additional examples of dynamically typed languages besides JavaScript include Python, Ruby, Lua, Scheme and Lisp, and
@@ -49,8 +50,8 @@ largely similar because of their type system. So called dynamically typed langua
 duck-typed or duck languages.
 
 
-Adopting many of these identifying features, and really as an exercise in constructing a language from basic parts, we
-will build the _Duck programming language_ from the ground up. We will explore this process without regard to its 
+Adopting many of these identifying features, and really as an exercise in constructing a language from basic parts,
+we will build the _Duck programming language_ from the ground up. We will explore this process without regard to its 
 pragmatism or practicality. Indeed, any ideas of utility will come only after we have completed the process.
 
 
@@ -64,13 +65,13 @@ on the topic of programming language design before embarking on this journey. Wi
 
 
 At this point it might be easy to scrabble together a document of syntactic expressions, beginner how-to tutorials,
-Wikis, or grammar guides as an explanation of the language and drop the topic altogether, moving on to more productive
-tasks. Sometimes it seems like the design of a language, down to its true grammar, is something more for liner-notes
-on a reference manual than something that exists that has been written, crafted, or changed over time. The purpose of
-this explanation is not to suggest that your programming language should be chiselled into stone and that that is how
-great concepts come to fruition. Instead, true to the nature of our task, we will at every step of the way look at how
-things can be changed, expanded, and made to evolve over time. What might be suitable for one task is not the solution
-to every problem, and having a way to change things or reuse our efforts is always good.
+Wikis, or grammar guides as an explanation of the language and drop the topic altogether, moving on to more
+productive tasks. Sometimes it seems like the design of a language, down to its true grammar, is something more for
+liner-notes on a reference manual than something that exists that has been written, crafted, or changed over time.
+The purpose of this explanation is not to suggest that your programming language should be chiselled into stone and
+that that is how great concepts come to fruition. Instead, true to the nature of our task, we will at every step of
+the way look at how things can be changed, expanded, and made to evolve over time. What might be suitable for one
+task is not the solution to every problem, and having a way to change things or reuse our efforts is always good.
 
 
 With that in mind, we will sort of gloss over what the fundamental mechanics of the _Duck language_ are at the atomic
@@ -80,17 +81,17 @@ enough. Still, programming languages are systems that we use to express ideas. A
 be useful, we need to have some common ground.
 
 
-We will create a language that is very neutral to the background of the programmer. We will also work in an imperative
-style. Although certain ideas of functional nature may seep through eventually, we are trying to build the
+We will create a language that is very neutral to the background of the programmer. We will also work in an
+imperative style. Although certain ideas of functional nature may seep through eventually, we are trying to build the
 basic language for the common programmer. 
 
 
-To find a root concept we can work from, let's begin with statements. There are statements that form operations. Given
-two values, add them together and assign the result. If an expression is true, execute a block of statements. Evaluate
-expressions and then make a procedure call with arguments. Etcetera. A block of statements will be described in terms
-of a statement list. Given a function declaration, a kind of statement, there is a name for the function, a list of 
-parameter names, and a list of statements making up the body. An If/Else statement has a similar nature. It is a 
-statement that contains additional statements.
+To find a root concept we can work from, let's begin with statements. There are statements that form operations.
+Given two values, add them together and assign the result. If an expression is true, execute a block of statements.
+Evaluate expressions and then make a procedure call with arguments. Etcetera. A block of statements will be described
+in terms of a statement list. Given a function declaration, a kind of statement, there is a name for the function, a
+list of parameter names, and a list of statements making up the body. An If/Else statement has a similar nature. It
+is a statement that contains additional statements.
 
 To provide a little bit of framework to work from, let's write down what some of these ideas might look like.
 
@@ -123,9 +124,11 @@ Looking at the syntax we have, we seem to have borrowed the end-block notation f
 coincidental. We could just as easily have styled our language after BASIC and terminated IF statements with ENDIF
 rather than simply the keyword **end**. I don't have any real justification for this.
 
+
 What I would justify, however, is the use of real words in syntax. I think this is plainer and more easily readable
 or simpler to understand than using a large amount of syntactic symbols to delineate blocks and other control
 structures. So wherever we can, we will use whole words in our language's grammar.
+
 
 As before we introduced the idea of a function definition, or a function declaration, let's jot down what that looks
 like.
@@ -145,13 +148,14 @@ end
 ```
 
 We won't put any limitations on the placement of these. Functions can be defined inside of functions. In this case
-they will be local to where they are defined. We don't want to introduce limitations when forming our definitions from
-the start, because they might be based on expectations that aren't true. If the limitations we impose on ourselves are
-artificial, then we will be putting time and effort into enforcing artificial limitations, and that becomes wasted
-effort. On functions, the use of **end** as a keyword seems more justifiable, as it is much shorter than 
-**end function**. A good middle-ground might be **endf**. This depends on if we want to allow END to be a specific
-command that terminates the running program. I always thought this might be a useful instruction, but it's not often
-included in languages. Instead, we might have a system command for quit() that we can invoke from our program.
+they will be local to where they are defined. We don't want to introduce limitations when forming our definitions
+from the start, because they might be based on expectations that aren't true. If the limitations we impose on
+ourselves are artificial, then we will be putting time and effort into enforcing artificial limitations, and that
+becomes wasted effort. On functions, the use of **end** as a keyword seems more justifiable, as it is much shorter
+than **end function**. A good middle-ground might be **endf**. This depends on if we want to allow END to be a
+specific command that terminates the running program. I always thought this might be a useful instruction, but it's
+not often included in languages. Instead, we might have a system command for quit() that we can invoke from our
+program.
 
 
 Our language must have some common ground with existing languages, so we will use familiar constructs like for loops
@@ -209,13 +213,13 @@ internally as arrays, and the syntax for each can be used interchangeably.
 Our array and dictionary example.
 
 
-Another feature that increases our flexibility is allowing functions to be first-class objects. This means that we can
-use functions as parameters, return them as values, and assign them to named variables. We can rename a function and
-use the original name for something else. We can attach functions to objects and use them as classes. Although passing
-functions as first-class objects is a functional idea, here it overlaps with the ideas of dynamic languages so we will
-adopt this feature. In order to keep track of objects and complex types, it makes sense to implement memory management
-through garbage collection, instead of passing that large responsibility on to the programmer adapting to use our
-language.
+Another feature that increases our flexibility is allowing functions to be first-class objects. This means that we
+can use functions as parameters, return them as values, and assign them to named variables. We can rename a function
+and use the original name for something else. We can attach functions to objects and use them as classes. Although
+passing functions as first-class objects is a functional idea, here it overlaps with the ideas of dynamic languages
+so we will adopt this feature. In order to keep track of objects and complex types, it makes sense to implement
+memory management through garbage collection, instead of passing that large responsibility on to the programmer
+adapting to use our language.
 
 
 Roughly this is a description of the language we intend to create. 
@@ -227,25 +231,25 @@ Roughly this is a description of the language we intend to create.
 A casual reader following along might not be interested in developing their own language, as of this moment. They
 might be more interested in the mechanics involved. As a rather elaborate exercise, I invite anyone to attempt to
 create their own interpreted programming language. That being said, I am about to outline the process
-and tools that I used to create _the duck programming language_, even though I recognize there are multiple ways to go
-about the process. 
+and tools that I used to create _the duck programming language_, even though I recognize there are multiple ways to
+go about the process. 
 
 
 For example, I chose to write everything in the C programming language. This is really a more difficult task than it
 has to be, but I will explain my decision further on. It might be easier for a developer to go about creating a
 language with any other environment. A truly dedicated engineer might have already targeted a platform and decided to
 start from the get-go with handwritten assembly language. This is not a very portable solution. Another endeavoring
-developer might start with a modern language like Java or C#. These are great choices and I would encourage picking up
-whatever tools you are familiar with. For reasons that may or may not be obvious, I would recommend fashioning this
-dynamic language we are creating in a static host environment. So, a language like Go would be preferred to Scheme. I
-know that a number of courses teach programming languages by implementing a Scheme or Lisp interpreter. What we are
-doing is not far off from that except for large differences in style and syntax. And usually these courses require
-writing the language interpreter in the language itself, or involve a similar kind of task. The reason I would
-recommend staying away from this course is because it begins to lead to deliberately impractical solutions. The
-performance you can get from a self-hosted environment is really only half-way there, and any of the benefits of the
-solution we are creating tend to get taken away. Forging special frontends for a language can be very useful, and
-there are ways to improve productivity and performance by creating a special dialect, but what we are going for is an
-entirely new language.
+developer might start with a modern language like Java or C#. These are great choices and I would encourage picking
+up whatever tools you are familiar with. For reasons that may or may not be obvious, I would recommend fashioning
+this dynamic language we are creating in a static host environment. So, a language like Go would be preferred to
+Scheme. I know that a number of courses teach programming languages by implementing a Scheme or Lisp interpreter.
+What we are doing is not far off from that except for large differences in style and syntax. And usually these
+courses require writing the language interpreter in the language itself, or involve a similar kind of task. The
+reason I would recommend staying away from this course is because it begins to lead to deliberately impractical
+solutions. The performance you can get from a self-hosted environment is really only half-way there, and any of the
+benefits of the solution we are creating tend to get taken away. Forging special frontends for a language can be very
+useful, and there are ways to improve productivity and performance by creating a special dialect, but what we are
+going for is an entirely new language.
 
 
 I will note that there is one way that implementing this dynamic language in an interpreted or scripting language
@@ -258,17 +262,17 @@ Reasons supporting my decision to use C are chiefly that:
 
 
 * It is portable. A program written in C can be deployed on virtually any operating system. It is easy to
-compile for any device and can be executed on almost any microprocessor. Especially when this code is written with the
-standards in mind. I would also choose to avoid any new features in the language to maximize compatibility.
+compile for any device and can be executed on almost any microprocessor. Especially when this code is written with
+the standards in mind. I would also choose to avoid any new features in the language to maximize compatibility.
 
 * It is low-level. Without delving into assembly and machine code itself, C represents a close barrier to the target
-machine itself. Not knowing what CPU our code will execute on or the exact layout of registers, we want to be aware of
-what sort of instructions will be executed and how our program will be laid out in memory.
+machine itself. Not knowing what CPU our code will execute on or the exact layout of registers, we want to be aware
+of what sort of instructions will be executed and how our program will be laid out in memory.
 
 * It is not garbage collected. While this point can be debated, the purpose of this project is in ways to create
 something new. So, creating a new language with higher level features, it is easier to feel a sense of accomplishment
-when we are working on features we didn't have from the start. This also helps us to have control over the runtime for
-our final interpreter, as we are being dealt the responsibility of memory management ourselves.
+when we are working on features we didn't have from the start. This also helps us to have control over the runtime
+for our final interpreter, as we are being dealt the responsibility of memory management ourselves.
 
 
 * It's difficult. This hardly qualifies as a reason. I would say that one reason would be '_because it is fast_,' but
@@ -328,21 +332,21 @@ reserved words while we contemplate the additions we can make to the language do
 
 
 Our lexer will begin by looking at the next input character. Here at the start, we will look at the first 
-non-commented out character in our source file's source text. It may be a letter, a number, another type of glyph like
-parentheses or a plus-sign, a whitespace character, or a newline character. If it is a whitespace character we can
-ignore it. At this point, we are only using whitespace as a delimiter. It marks a boundary between tokens that must
-be separated, like keywords and identifier names. Not all tokens will be divided by whitespace, as it is possible for
-certain characters to follow each other that form different tokens. 
+non-commented out character in our source file's source text. It may be a letter, a number, another type of glyph
+like parentheses or a plus-sign, a whitespace character, or a newline character. If it is a whitespace character we
+can ignore it. At this point, we are only using whitespace as a delimiter. It marks a boundary between tokens that
+must be separated, like keywords and identifier names. Not all tokens will be divided by whitespace, as it is
+possible for certain characters to follow each other that form different tokens. 
 
 
 Let's assume that we encounter a character from the alphabet. Then we could be looking at an identifier (something we
 use in the program to label a variable, procedure, or field) or a keyword. Following the conventions for naming 
 identifiers in our language, we will allow anything that starts with a letter and continues with any combination of 
-letters, numbers, or underscores to name a variable. So we will continue scanning until we reach a character that does
-not match or until we reach the end of the input; At this point we will either add an identifier or a keyword to our
-list of lexemes. We will have to check our list of keywords to see if this identifier is in fact a keyword. In that
-case, our lexer emits a 'token' instead and finds the right token constant for this keyword, here its index in our
-list. Otherwise, we add an identifier token to the lexemes and attach the string literal for the identifier.
+letters, numbers, or underscores to name a variable. So we will continue scanning until we reach a character that
+does not match or until we reach the end of the input; At this point we will either add an identifier or a keyword to
+our list of lexemes. We will have to check our list of keywords to see if this identifier is in fact a keyword. In
+that case, our lexer emits a 'token' instead and finds the right token constant for this keyword, here its index in
+our list. Otherwise, we add an identifier token to the lexemes and attach the string literal for the identifier.
 
 
 If we encounter a number, we will continue while we see numbers or decimal points until we see another character or 
@@ -372,14 +376,14 @@ the literal string.
 
 Then, if we encounter a newline, we will emit a newline token, as our language will use these to aid in its
 grammatical structure. After we have lexed any one token or lexeme, we advance the input to the end of that token and
-continue lexing the source text, until we have reached the end of our input. At the end of the program, we add another
-token which represents the end of file. In literal form we'll denote this as <$>, even though there is no time we will
-be writing this within our program itself, just in providing documentation and analysis.
+continue lexing the source text, until we have reached the end of our input. At the end of the program, we add
+another token which represents the end of file. In literal form we'll denote this as <$>, even though there is no
+time we will be writing this within our program itself, just in providing documentation and analysis.
 
 
 What we now have is a complete list of tokens that represents the entire workable source code of the program. We can
-discard any extraneous data structures that we are using at this point, close any file handles, and free any temporary
-buffers. Our token stream will then be passed on to our parser to generate an abstract syntax tree.
+discard any extraneous data structures that we are using at this point, close any file handles, and free any
+temporary buffers. Our token stream will then be passed on to our parser to generate an abstract syntax tree.
 
 
 #### Part 5: The Parser
@@ -397,12 +401,12 @@ that would process each kind of statement, and in-turn would match up symbols. T
 "recursive descent parser" and it is one form of top-down parsing.
 
 Unfortunately, top down parsers have their limitations. Without getting too pedantic, we will simply say that our
-recursive descent parser would be limited by its complexity in writing, the set of language structures it could parse,
-and possibly its runtime efficiency. As a counterpoint, it might be very flexible to minor changes in the language.
-I would also like to note that, as one method of by-hand parsing, the top-down recursive descent parser lies close to
-an area of do-it-yourself parsing techniques that might very well be able to parse any grammar. From a computational
-theory perspective, a function can be written in any sufficiently suitable language to recognize any deterministic
-language. But we are looking for a more sure-footed answer than that.
+recursive descent parser would be limited by its complexity in writing, the set of language structures it could
+parse, and possibly its runtime efficiency. As a counterpoint, it might be very flexible to minor changes in the
+language. I would also like to note that, as one method of by-hand parsing, the top-down recursive descent parser
+lies close to an area of do-it-yourself parsing techniques that might very well be able to parse any grammar. From a
+computational theory perspective, a function can be written in any sufficiently suitable language to recognize any
+deterministic language. But we are looking for a more sure-footed answer than that.
 
 The legendary green and red dragon books, by Aho and Ullman and Aho, Sethi, and Ullman.
 
@@ -426,8 +430,8 @@ on a set of rules that we provide it describing how productions are formed. It i
 operates on one token at a time, while using a stack, to either shift a token or reduce a production. 
 
 In order to do this, the parser needs a large table to guide it in its operations. This table will be based on the
-rules to our production grammar and it will outline a finite number of states that the parser can exist in while it is
-in the process of parsing.
+rules to our production grammar and it will outline a finite number of states that the parser can exist in while it
+is in the process of parsing.
 
 
 ##### Context-Free Grammars
@@ -472,9 +476,9 @@ more symbols or tokens in our program. It itself is a terminal production.
 
 
 Non-terminals are symbols that we defined in the grammar itself. \<expr\>, \<term\> and \<factor\> are all
-non-terminal symbols. \<S\> is also a non-terminal. As we have formed rules with left and right-hand sides, divided by
-the **::=** operator, we've noticed that symbols are delimited by angle braces. And we've already accounted for the
-tokens that we recognize as being terminal symbols. So what about the other symbols? \<integer\> is a built in
+non-terminal symbols. \<S\> is also a non-terminal. As we have formed rules with left and right-hand sides, divided
+by the **::=** operator, we've noticed that symbols are delimited by angle braces. And we've already accounted for
+the tokens that we recognize as being terminal symbols. So what about the other symbols? \<integer\> is a built in
 terminal. It is synonymous with the lexer token produced by integers in the lexing phase. Similarly, \<epsilon\> is a
 built in terminal. It is something that we are defining inside of the parser. But what does it represent? It
 is synonymous with an empty production. In the case of the second example, it is the production we reach when we run
@@ -487,27 +491,27 @@ Other examples of built-in symbols that we might need and need to use are \<endl
 a symbol that reduces to true or false, which would then become keywords.
 
 
-Our parser generator will load a context-free grammar as a ".cfg" file and will itself parse the production rules from
-this file. For convenience, we will allow for comments in the grammar as lines starting with a ';' semicolon. Then we
-begin by working line-by-line. If this line isn't blank or beginning with a comment, then it is a new rule. First, we
-must identify the left-hand side. We will work by finding the beginning and end brace '<' and '>'. We are using
-newlines for a special purpose in enumerating rules, so these cannot occur anywhere in the left or right-hand side
-of the production, however use of spaces and other symbols is permissible, as long as everywhere the non-terminal
-symbol occurs, it is used with the exact same matching literal. Once we've identified the left hand side, we will
-generate a symbol identifier for it. This is a unique number that corresponds to this symbol. We will be building a
-table of symbols as we go, so if we encounter the same symbol again, we will use the same integer value. After
-identifying the left-hand side, we will look for the BNF symbol that divides the production. 
+Our parser generator will load a context-free grammar as a ".cfg" file and will itself parse the production rules
+from this file. For convenience, we will allow for comments in the grammar as lines starting with a ';' semicolon.
+Then we begin by working line-by-line. If this line isn't blank or beginning with a comment, then it is a new rule.
+First, we must identify the left-hand side. We will work by finding the beginning and end brace '<' and '>'. We are
+using newlines for a special purpose in enumerating rules, so these cannot occur anywhere in the left or right-hand
+side of the production, however use of spaces and other symbols is permissible, as long as everywhere the
+non-terminal symbol occurs, it is used with the exact same matching literal. Once we've identified the left hand
+side, we will generate a symbol identifier for it. This is a unique number that corresponds to this symbol. We will
+be building a table of symbols as we go, so if we encounter the same symbol again, we will use the same integer
+value. After identifying the left-hand side, we will look for the BNF symbol that divides the production. 
 
 
 In parsing the right hand side of a production rule, we will look for either another symbol, identified with angle
 braces, or a keyword/token. In the case that we need less-than or greater-than symbols to appear in our production
 rules, we will use a backslash to delimit them, such as "\\<". On finding whitespace, we will just advance to finding
-the next token, but if we encounter any symbol other than the beginning of a non-terminal symbol's token, then we will
-use this as a terminal and add it to our list of tokens for the lexer. Encountering a keyword, this will be added to
-the list of tokens and its token number will be added to the rule. So eventually we have rules that are determined by
-a left-hand side (LHS) non-terminal symbol and a right-hand side (RHS) of terminal and non-terminal symbols, all of
-which are determined by identifying integer constants. We also have a table of keywords and symbol glyphs that we can
-provide to the lexer.
+the next token, but if we encounter any symbol other than the beginning of a non-terminal symbol's token, then we
+will use this as a terminal and add it to our list of tokens for the lexer. Encountering a keyword, this will be
+added to the list of tokens and its token number will be added to the rule. So eventually we have rules that are
+determined by a left-hand side (LHS) non-terminal symbol and a right-hand side (RHS) of terminal and non-terminal
+symbols, all of which are determined by identifying integer constants. We also have a table of keywords and symbol
+glyphs that we can provide to the lexer.
 
 ##### Building LR(1) Parse Tables
 
@@ -515,10 +519,10 @@ The process of building a parse table from the grammar is slightly more complex.
 algorithm, the process is as follows. First, nullable non-terminals must be identified. These are any of the cases
 where a non-terminal symbol may reduce to an \<epsilon\> production. In the above example, example 2, this is seen
 with the \<S\> token. Indeed, an empty stream of lexing tokens would be recognized by this parser. This is also a
-transitive property. If a non-terminal symbol reduces to another non-terminal symbol which is nullable, then it itself
-is a nullable non-terminal. Additionally, if a non-terminal symbol reduces to a production with any number of nullable
-non-terminal symbols, without any terminals, then it is a nullable non-terminal. These symbols are all identified
-first in a table.
+transitive property. If a non-terminal symbol reduces to another non-terminal symbol which is nullable, then it
+itself is a nullable non-terminal. Additionally, if a non-terminal symbol reduces to a production with any number of
+nullable non-terminal symbols, without any terminals, then it is a nullable non-terminal. These symbols are all
+identified first in a table.
 
 
 Next, a table of first sets is generated. Given any non-terminal symbol or left-hand production symbol, the first set
@@ -530,19 +534,20 @@ productions are nullable.
 Next, a table of follow sets is generated, using the first set and set of nullable non-terminals as references. The
 follow set or FOLLOW(a) represents the possible terminal tokens that may appear after a production. The LR(1)
 algorithm uses a look-a-head of one symbol when parsing, so this helps the parser determine which state to transition
-to next. In the case of the root or base production, the follow set will include \<$\>. For other productions, it will
-include the set of terminals that may come after that production in any context it might be found in this given
+to next. In the case of the root or base production, the follow set will include \<$\>. For other productions, it
+will include the set of terminals that may come after that production in any context it might be found in this given
 grammar.
 
 ###### First Set Examples
 
-We have already determined the nullable non-terminals fairly easily. In practice, a larger context-free grammar may be
-complex enough that it would take a fair bit more work. In any case, I'm relatively certain that we can implement this
-logic in code.
+We have already determined the nullable non-terminals fairly easily. In practice, a larger context-free grammar may
+be complex enough that it would take a fair bit more work. In any case, I'm relatively certain that we can implement
+this logic in code.
 
 
 To help in understanding the concept of the FIRST(a) set, I will give examples for each of the (small) sample
 grammars.
+
 
 An example from the arithmetic language.
 
@@ -552,20 +557,26 @@ An example from the arithmetic language.
 |\<term\> | integer |
 |\<factor\> | integer |
 
+
 Here we see that, each of these productions must begin with an integer token.
 
+
 Now consider the parentheses language.
+
 
 | Symbol | First Set |
 |--------|----------:|
 | \<S\> | ( |
+
 
 This one is even simpler. The only token that begins the \<S\> symbol's production in our grammar is the open 
 parentheses symbol. In the case that it is empty, I suppose the first token might be \<epsilon\> but this is
 information we already have from the nullable non-terminals set, and we generally won't consider \<epsilon\> as a
 terminal token.
 
+
 ###### Follow Set Examples
+
 
 Now for examples from the follow set. These sets require the FIRST set to generate, but they also must consider other
 tokens in a production rule. Building these sets involves looking at each production rule and seeing what tokens
@@ -573,13 +584,16 @@ follow any possible symbols. In addition, the process is only complete when all 
 Since each symbol could be dependent on another symbol's FIRST and FOLLOW sets, the algorithm really must be ran
 repeatedly until there are no more changes to the FOLLOW set.
 
+
 Here, let's look at the arithmetic language.
+
 
 | Symbol | Follow Set |
 |--------|----------:|
 |\<expr\> | +, \<$\> |
 |\<term\> | *, +, \<$\> |
 |\<factor\> | *, +, \<$\> |
+
 
 In this case, we've added the end of file token. That's because any of these symbols can be the last symbol in our
 language. The only thing following that is our end of input. An expression can be followed by a '+' plus sign, we can
@@ -589,16 +603,20 @@ symbol on the right-hand side (aside from our implicit rule, *\<start\> ::= \<ex
 anywhere an \<expr\> is, so \<term\>'s follow set must include \<expr\>'s follow set as a sub-set. The same goes for
 our \<factor\> symbol.
 
+
 Now let's look at the balanced parentheses language.
+
 
 | Symbol | Follow Set |
 |--------|-----------:|
 |\<S\> | (, ), \<$\> |
 
+
 It's clear from rule \#1 that ')' should be in the follow set. It follows \<S\> right? And it's also clear from rules
 \#0 and \#1 that \<$\> would be in the follow set again. But where does the '(' opening parentheses symbol come from?
 Consider rule \#2 where *\<S\> ::= \<S\> \<S\>*. As \<S\> follows \<S\>, all of the elements from the First set for
 \<S\> must be in the Follow set for \<S\>. So we add that opening parentheses sign.
+
 
 Note: things can get more complex when we have nullable non-terminal symbols sandwiched in the middle of a grammar
 rule. For a moment consider this imaginary rule *\<A\> ::= \<A\> \<B\> \<C\>*. When building \<A\>'s Follow set, of
@@ -606,8 +624,8 @@ course we would start with the First set from \<B\>. But in the case that \<B\> 
 include the First set of \<C\>. To give an even more complex example, consider the imaginary rule *\<D\> ::= \<A\>
 \<B\> \<C\>*. Again we are trying to determine \<A\>'s Follow set. We would do the same as above, but now what if
 \<C\> is a nullable non-terminal as well? Then \<A\>'s Follow set must contain all of the elements of \<D\>'s Follow
-set. (The first imaginary rule is insufficient for this example as saying \<A\>'s Follow set must contain the elements
-of \<A\>'s Follow set really tells us nothing.)
+set. (The first imaginary rule is insufficient for this example as saying \<A\>'s Follow set must contain the
+elements of \<A\>'s Follow set really tells us nothing.)
 
 
 ###### The Canonical Collection of LR(1) Item Sets
@@ -668,6 +686,7 @@ code.
 
 ##### Stack-based Parsing
 
+
 The parser itself starts from state zero and works from the token stream yielded by the lexer to provide input to the
 LR(1) algorithm. Actions are pulled from the action table based on this input token and the parsers state. If a
 reduce action is encountered, then given the size of the corresponding production, that many symbols and states are
@@ -675,23 +694,25 @@ popped from the stack and added to a tree leaf. This tree is then pushed onto th
 from the Goto table. Successive states are taken from the top of the stack to determine the parser's next move.
 
 
-If a shift action is encountered, the input token is pushed to the stack followed by the shift value, which represents
-a parser state. Our parser has a special step in the reduce case that identifies if the left-hand side is the goal
-symbol. In this case, it identifies the tree leaf to be the program's root element and stores it.
+If a shift action is encountered, the input token is pushed to the stack followed by the shift value, which
+represents a parser state. Our parser has a special step in the reduce case that identifies if the left-hand side is
+the goal symbol. In this case, it identifies the tree leaf to be the program's root element and stores it.
 
 
 Finally, when the accept action is reached, the parsing is complete. If another state is encountered, the stack is
 empty, or another unhandled error occurs, we can say that the parse failed and provide the input token that it failed
 on. Since we have line numbers for tokens, we can indicate which line the parsing failed on. And given a bit more
-knowledge of the parser, we can identify whether there was an error due to running out of input, because of a specific
-syntax error, or other special cases. And given the specific failed token/production we could easily provide
+knowledge of the parser, we can identify whether there was an error due to running out of input, because of a
+specific syntax error, or other special cases. And given the specific failed token/production we could easily provide
 customized error messages that indicate what was wrong with the input source. These are all ancillary needs.
+
 
 As an example of what our resulting syntax tree will look like, let's look again at a simplified example. The grammar
 for our language deals with a number of different language constructs. We have if's/else's, functions, while loops,
 and for loops. Each of these statements must have some type of code to run, so we also must have assignment
 statements. Our loops and conditionals need conditions to evaluate, so we also require Boolean expressions. This
 necessitates a whole framework of expressions. 
+
 
 To support all the operations of math that we require, as well as logic, function composition, variable and array
 referencing, we will need to create a grammar for expressions. Including that entire description here might be
@@ -700,18 +721,22 @@ operations set up for addition, multiplication, and modulus division as we menti
 example grammar, we can see how we might set up a hierarchy for orders of operations. In addition, we'll add
 parentheses as another requirement to maintain operator precedence.
 
+
 Given all of these structures, we may make way to parsing this given expression:
 
+
 > -1 * 2 + 3 mod 4
+
 
 As we declined to include negative numbers in the definition of our lexer, we'll also have to add negation to one of
 the operators in our programming language. After this sequence has passed through the lexer, it will be given to the
 parser. The parser will recognize it as a statement that simply reads as a standalone expression. The expression is
-made up of terms and factors and then generates an abstract syntax tree. Initially, this tree will contain a number of
-branches that connect nodes in trivial ways. As we said before, sometimes an expression is just a term, and sometimes
-a term is just a factor. To avoid operating on trivial constructions, or at least for viewing what this syntax tree
-looks like, we will want to eliminate trivially simple productions. This is easily handled by making a list of all of
-the trivial productions. Then let's view what the syntax tree for this statement looks like.
+made up of terms and factors and then generates an abstract syntax tree. Initially, this tree will contain a number
+of branches that connect nodes in trivial ways. As we said before, sometimes an expression is just a term, and
+sometimes a term is just a factor. To avoid operating on trivial constructions, or at least for viewing what this
+syntax tree looks like, we will want to eliminate trivially simple productions. This is easily handled by making a
+list of all of the trivial productions. Then let's view what the syntax tree for this statement looks like.
+
 
 ![Expression Syntax](diagram.png?raw=true "Expression Syntax Tree")
 
@@ -723,21 +748,22 @@ language's programs.
 
 #### Part 6: The Interpreter
 
+
 This is where things leave the frontend. Surprisingly, from my experience, designing and implementing the frontend
 takes the bulk of the effort, and the backend work can be streamlined fairly easily. That may be because of the
 choices we made. In taking complete control of the solution, and offering maximum flexibility, up-front we made so
-many choices that led to handling all possibilities. Now we are left with something simple: the specific grammar rules
-we constructed, and a parsed and processed source that fits this structure. Although this structure is largely built
-up of generic data-types, we can be sure that this abstract syntax tree meets many rigid runtime constraints. So, one
-question becomes, what is the most effective way to operate on this data? Although this might not be the best
+many choices that led to handling all possibilities. Now we are left with something simple: the specific grammar
+rules we constructed, and a parsed and processed source that fits this structure. Although this structure is largely
+built up of generic data-types, we can be sure that this abstract syntax tree meets many rigid runtime constraints.
+So, one question becomes, what is the most effective way to operate on this data? Although this might not be the best
 solution, my straightforward answer was to use code generation from the programming language's grammar itself.
 
 
-Each production is converted into a C function that is called with the production's leaf node from the abstract syntax
-tree. Basically, our parser has an extra step where it generates a C file with boilerplate code for each of our 
-rules. We can call these stubs. Each of these production calls is dispatched from a table that associates production
-numbers (rule numbers) with the correct C function. These are called when a function decides to call InterpretNode on
-a child production. 
+Each production is converted into a C function that is called with the production's leaf node from the abstract
+syntax tree. Basically, our parser has an extra step where it generates a C file with boilerplate code for each of
+our rules. We can call these stubs. Each of these production calls is dispatched from a table that associates
+production numbers (rule numbers) with the correct C function. These are called when a function decides to call
+InterpretNode on a child production. 
 
 
 Example:
@@ -795,8 +821,8 @@ We can see how our simple production rules are able to split the work that we ar
 rule isn't considered with the details of how a \<comparison\> or an \<arithmetic\> symbol is resolved into an 
 expression or a VALUE in our backend. Instead, we can focus on the atomic operation of equality. Here we have made
 external the actual logic of CompareEquality to make our code more readable. Since we have a listing of 50 to 100
-grammar productions, we want them to be as short as possible. This allows us to keep them in one place and ensure that
-they all are following the same conventions.
+grammar productions, we want them to be as short as possible. This allows us to keep them in one place and ensure
+that they all are following the same conventions.
 
 
 Working from the grammar directly poses its own limitations. Changing specific language features or simply tweaking
@@ -808,14 +834,15 @@ getting stuck in a process of identifying array children and child node traits.
 
 
 In any case, this is where the core of the language's work will be carried out. Evaluating the program will be
-dispatched by production number, and each production will handle its workload and process child productions as needed.
-The interpreter is aided by a virtual environment, or a runtime state and context, that it can use to track variables,
-procedures, function scopes, closures, and dynamic variables.
+dispatched by production number, and each production will handle its workload and process child productions as
+needed. The interpreter is aided by a virtual environment, or a runtime state and context, that it can use to track
+variables, procedures, function scopes, closures, and dynamic variables.
 
 
 
 
 The main dispatch becomes something like this
+
 
 ```C
 /* reduce one node */
@@ -878,6 +905,7 @@ are using for syntactic forms that don't necessarily make sense on their own.
 
 
 Let's look at our grammar for function definitions, a certain kind of statement.
+
 
 ```
 <function def> ::= function <identifier> <parameters> <endl> <stmt list> end
@@ -1026,7 +1054,7 @@ definition as to how a sequence of if, else if, and else statements should be pa
 
 
 Pragmatically then, we will interpret the \<else if\> node only if the condition is false. In that case, that could
-lead to either a \<stmt list\> that is always executed, an \<if\> statment this is also executed, or an empty
+lead to either a \<stmt list\> that is always executed, an \<if\> statement this is also executed, or an empty
 production.
 
 
@@ -1069,8 +1097,8 @@ We determined this when we made the decision to use lexical scoping.
 
 Aside from the definitions we have for values, contexts, functions, hash tables or dictionaries as data types, there
 may be some other information that we need to access and store. As function calls are made and returned, we might
-need access to that closure or scope level. So, we should keep a callstack of functions that are currently executing.
-This also helps us for debugging runtime errors, an issue that we haven't really discussed.
+need access to that closure or scope level. So, we should keep a call stack of functions that are currently
+executing. This also helps us for debugging runtime errors, an issue that we haven't really discussed.
 
 #### Part 8: The Library
 
@@ -1088,7 +1116,7 @@ function pointer, we can provide hooks to library functions and store them in th
 with some simple manipulation, we can create our own namespace for a library by using a named scope. 
 
 
-The way that our library will interface with *the Duck language* is relatively simple. At startup, the language will
+The way that our library will interface with *the Duck language* is relatively simple. At start up, the language will
 bind libraries that are included in its distribution. During this phase, the library has the opportunity to create
 hooks for its common functions, data, and constant data. Functions are integrated by first providing a pointer to the
 procedure and then providing a list of the named parameters. As we allow for any type of object to passed as
@@ -1131,8 +1159,8 @@ decreases, until finally, if the last reference to the object is lost, it should
 When working correctly, which is not something I was able to achieve, there are a number of advantages to reference
 counting as a garbage collection method. First of all, it does not require stopping execution to reclaim memory. This
 is something that happens automatically as objects come into and out of scope. It is also relatively easy to
-understand and should be simple to implement. Unfortunately, I was unable to find all of the possible edgecases where
-references were created and lost, so I was not able to test this method. This leads me to the drawbacks.
+understand and should be simple to implement. Unfortunately, I was unable to find all of the possible edge cases
+where references were created and lost, so I was not able to test this method. This leads me to the drawbacks.
 
 
 Reference counting as a form of garbage collection requires a careful watch on when objects are destroyed. If an
@@ -1148,7 +1176,7 @@ first holding a list of every dynamic value, every dynamic string, every context
 dictionary or hash table from the moment it is allocated. This doesn't have to be a list, it could be any data
 structure that allows us to find and locate elements and also iterate through each of them. What we will do is,
 occasionally as our program is running, we will stop execution. Then we will look at all of the variables that the
-currently running program has access to, including the entire callstack. This must include local variables, global
+currently running program has access to, including the entire call stack. This must include local variables, global
 variables, any object that references another variable, and any functions that can access a given context or closure
 when being executed. When everything that is still 'alive' is identified, we compare this with all of our
 allocations. Anything that we haven't identified is now 'dead' and can be removed from memory.
@@ -1162,7 +1190,7 @@ references. It's also very much behind the scenes, as long as allocations are be
 
 
 The *Duck programming language* currently uses a tracing garbage collector. It is highly accurate and handles a
-number issues like dead callstacks and parameter lists rather well. One concern would be to offer better integration
+number issues like dead call stacks and parameter lists rather well. One concern would be to offer better integration
 with user libraries, which is definitely one area for improvement in the future. There are also a number of ways to
 go about improving its performance by using better data structures.
 

@@ -1100,6 +1100,60 @@ may be some other information that we need to access and store. As function call
 need access to that closure or scope level. So, we should keep a call stack of functions that are currently
 executing. This also helps us for debugging runtime errors, an issue that we haven't really discussed.
 
+
+##### The Live Interpreter
+
+One of the best ways to test and use our new programming language is with a live, interactive terminal. We call this
+the Read-Evaluate-Print-Loop or REPL. Implementing something like this won't be difficult for us, but it will take a
+few more additions or tweaks to the system we have already. Recall that our parser used a number of states to
+organize our program source into an abstract syntax tree when provided input from the lexer. Now remember that there
+were several ways for this process to fail. One of these failure cases was when the parser was looking for more
+input, usually for a shift operation. Well, instead of failing at this point, an interactive interpreter offers us
+the option of running a program in parts, and also allowing a terminal user to provide the program line-by-line.
+
+In general, we can take an input line from the user, run it through the lexer, then the parser, and interpret it to
+change our virtual machine's state, and then print the result. However, sometimes a valid section of code can't fit
+on a single line, like function declarations in our case. Then we will need to keep requesting input until we have
+the whole thing. We should also recognize when we have encountered a syntax error and need to throw away this buffer.
+
+Here is a simple program, written in *Duck*, that provides an interactive interpreter. It is included in the main
+program, to be executed when running the interpreter without any input.
+
+```
+/* Duck REPL ** Enter statements to be evaluated. */
+duck.println("Duck Language REPL - type quit() to exit")
+running = true
+while running do
+    program = ""
+    typing = true
+    expr = 0
+    duck.println("Type expression or statements:")
+    while typing do
+        line = duck.prompt(" > ")
+        program = program + line + duck.newline
+        parsable = duck.parses(program)
+        if parsable == 1 then
+            typing = false
+        else if parsable == -1 then
+            duck.println("Syntax error.")
+            duck.print(duck.newline)
+            program = ""
+        end
+    loop
+    ; duck.print(duck.newline)
+    expr = eval(program)
+    if expr or Type(expr) != 'NIL' then
+        duck.print(">> ")
+        duck.println(expr)
+    end
+    duck.print(duck.newline)
+loop
+```
+
+This is a great tool for accessing the language and increases its utility as it has already become a sort of pocket
+calculator to the programmer. 
+
+
 #### Part 8: The Library
 
 No language is useful in a real or practical way without the ability for programs to provide input and output. For

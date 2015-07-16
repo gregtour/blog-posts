@@ -404,7 +404,7 @@ an area of do-it-yourself parsing techniques that might very well be able to par
 theory perspective, a function can be written in any sufficiently suitable language to recognize any deterministic
 language. But we are looking for a more sure-footed answer than that.
 
-The legendary green and red dragon books, by Aho and Ulman and Aho, Sethi, and Ulman.
+The legendary green and red dragon books, by Aho and Ullman and Aho, Sethi, and Ullman.
 
 ![The Green Dragon Book](green.jpg?raw=true "Green") ![The Red Dragon Book](red.jpg?raw=true "Red")
 

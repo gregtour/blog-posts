@@ -385,7 +385,7 @@ buffers. Our token stream will then be passed on to our parser to generate an ab
 #### Part 5: The Parser
 
 We cannot yet talk about the parser until we talk about parser generators. Here I should mention that in our quest to
-find the most bendable way of going about doing things, we may be taking some extra-steps. As I said before, an
+find the most flexible way of going about doing things, we may be taking some extra-steps. As I said before, an
 enterprising programmer might start from the outset programming in assembly. While we have made our choices not to go
 that route, we have to look at the other more direct paths that we are giving up. This is in some ways a domain
 specific language that we are constructing. If we were really in-tune with what we wanted our resulting programming
@@ -481,11 +481,10 @@ is synonymous with an empty production. In the case of the second example, it is
 out of parentheses. 
 
 
-I would really like to go into as much detail on this topic as I can, but my explanation may be lacking. I would
-encourage any curious reader to gather as much information as he or she can on parsing techniques if interested.
-Alternatively, there are a number of ready made solutions for parser-generators out there that have been discussed
-before. This custom made parser generator has been split from the _Duck programming language_ project into its own
-branch, [available here](https://github.com/gregtour/parsergenerator), for those looking for the original source code.
+Other examples of built-in symbols that we might need and need to use are \<endl\> for newlines in the source,
+\<string\> which we would use for string literals, \<float\> for floating-point numbers our lexer identifies, and
+\<identifier\> which would match identifiers we find, or named variables. We can define Boolean types ourselves as
+a symbol that reduces to true or false, which would then become keywords.
 
 
 Our parser generator will load a context-free grammar as a ".cfg" file and will itself parse the production rules from
@@ -659,6 +658,14 @@ and finds the closure of these items to expand the set. There are other sets tha
 this item set, so the canonical collection is a collection built from these sets. 
 
 
+As was said before, there are a number of ready made solutions for parser generators out there that have already been
+developed and tested. Many of them use LALR or SLR algorithms, which we will find are slightly less generalized and
+less powerful than the LR(1) algorithm, but generally more compact in the tables they generate. The custom made
+parser generator that we have designed has been split from the _Duck programming language_ project into its own
+repository, [available here](https://github.com/gregtour/parsergenerator), for those looking for the original source
+code.
+
+
 ##### Stack-based Parsing
 
 The parser itself starts from state zero and works from the token stream yielded by the lexer to provide input to the
@@ -718,17 +725,22 @@ language's programs.
 
 This is where things leave the frontend. Surprisingly, from my experience, designing and implementing the frontend
 takes the bulk of the effort, and the backend work can be streamlined fairly easily. That may be because of the
-choices we made. In taking complete control of the solution, and offering maximum flexibility, we made so many choices
-up-front that led to listing all of the options. Now we are left with something simple: the specific grammar rules we
-constructed, and a parsed and processed source that fits this structure. Although this structure is largely built up
-of generic data-types, we can be sure that this abstract syntax tree meets many rigid runtime constraints. So, one
+choices we made. In taking complete control of the solution, and offering maximum flexibility, up-front we made so
+many choices that led to handling all possibilities. Now we are left with something simple: the specific grammar rules
+we constructed, and a parsed and processed source that fits this structure. Although this structure is largely built
+up of generic data-types, we can be sure that this abstract syntax tree meets many rigid runtime constraints. So, one
 question becomes, what is the most effective way to operate on this data? Although this might not be the best
 solution, my straightforward answer was to use code generation from the programming language's grammar itself.
 
 
 Each production is converted into a C function that is called with the production's leaf node from the abstract syntax
-tree. Each of these production calls is dispatched from a table that associates production numbers with the correct
-C function. These are called when a function decides to call InterpretNode on a child production. Example:
+tree. Basically, our parser has an extra step where it generates a C file with boilerplate code for each of our 
+rules. We can call these stubs. Each of these production calls is dispatched from a table that associates production
+numbers (rule numbers) with the correct C function. These are called when a function decides to call InterpretNode on
+a child production. 
+
+
+Example:
 
 ```C
 /* 1. <program> -> <stmt list> */
@@ -743,12 +755,15 @@ int ReduceProgram(SYNTAX_TREE* node)
 }
 ```
 
-This is the automatically generated production for our most basic grammar rule. Since this rule is fully recursive,
-there is really nothing for us to do. A better example that might show how the internal logic is supposed to work
-might be a statement or instruction that must do some work.
+
+This is the automatically generated production for our most basic grammar rule, the rule 
+*\<program\> ::= \<stmt list\>*.
+Since this rule is fully recursive, there is really nothing for us to do. A better example that might show how the
+internal logic is supposed to work might be a statement or instruction that must do some work.
 
 
 This grammar production for an expression rule tests equality.
+
 
 ```C
 /* 74. <comparison> -> <comparison> == <arithmetic> */
@@ -776,20 +791,32 @@ int ReduceComparisonA(SYNTAX_TREE* node)
 ```
 
 
+We can see how our simple production rules are able to split the work that we are doing into manageable chunks. Our
+rule isn't considered with the details of how a \<comparison\> or an \<arithmetic\> symbol is resolved into an 
+expression or a VALUE in our backend. Instead, we can focus on the atomic operation of equality. Here we have made
+external the actual logic of CompareEquality to make our code more readable. Since we have a listing of 50 to 100
+grammar productions, we want them to be as short as possible. This allows us to keep them in one place and ensure that
+they all are following the same conventions.
+
+
 Working from the grammar directly poses its own limitations. Changing specific language features or simply tweaking
-the syntax may require re-laying out all of the work that has been done in crafting an interpreter. Some ways to
+the syntax may require re-laying out all of the work that has been done in crafting our interpreter. Some ways to
 lessen this burden might be to generate special constants and tokens based on the symbols in rules and use them to
-identify the rules. Or even better might be to directly name grammar rules. Additionally, it can be very helpful to
-create a set of functions or macros that allow for pulling out certain child data from a production, instead of
+identify the rules. Or even better yet might be to directly name grammar rules. Additionally, it can be very helpful
+to create a set of functions or macros that allow for pulling out certain child data from a production, instead of
 getting stuck in a process of identifying array children and child node traits.
 
 
 In any case, this is where the core of the language's work will be carried out. Evaluating the program will be
-dispatched by production id, and each production will handle its workload and process child productions as needed.
+dispatched by production number, and each production will handle its workload and process child productions as needed.
 The interpreter is aided by a virtual environment, or a runtime state and context, that it can use to track variables,
 procedures, function scopes, closures, and dynamic variables.
 
-The main dispatch is
+
+
+
+The main dispatch becomes something like this
+
 ```C
 /* reduce one node */
 int InterpretNode(SYNTAX_TREE* node)
@@ -819,21 +846,76 @@ int InterpretNode(SYNTAX_TREE* node)
 ```
 
 
-The runtime itself is deceptively simple. In general, all computation is stored in a single global variable (a very
-poor design up-front). This expression, gLastExpression, represents the value from the last operation or function
-call. Something like an addition operation will evaluate its left-hand side, store the result in a temporary value,
-evaluate the right-hand side, store the result in a temporary value, and then add the two results and store them in
-this gLastExpression register. Working in this fashion allows using return values for error codes, especially when
-not all productions return an expression, per se. A good example would be function parameters in a function
-declaration, compared to arguments in a function call. Working in this fashion, the data we need from performing
-simple computations is automatically stored on the stack. Our more complex storage requirements will be met by the
+Here we allow the code generator to help us somewhat by creating the jump table we will use in identifying
+productions. This isn't strictly necessary. One choice we've made here was the ability to track errors on a production
+by production basis. If we replace this logic with statement by statement errors, we can move this error checking into
+our \<stmt list\> production. Then we could track our production functions with function pointers stored in the
+abstract syntax tree. The benefit this provides is eliminating one function call for every rule definition. This could
+be a large boon for performance. Instead, we won't occupy ourselves with performance right now. There are a number of
+ways we can optimize our code and logic to provide much better performance in the future.
+
+
+The runtime itself is deceptively simple. In general, all of our computation is stored in a single global variable (a
+very poor design). This expression, gLastExpression, represents the value from the last operation or function call.
+Something like an addition operation will evaluate its first operand, store the result in a temporary value,
+evaluate the second operand, store the result in a temporary value, and then add the two results and store them in
+the gLastExpression register. Working in this fashion allows us to use return values for error codes, especially when
+not all productions return an expression, per se. The data we need from performing simple computation and our
+temporary variables are automatically stored on the stack. Our more complex storage requirements will be met by the
 heap.
+
+
+We will continue to fill in the bodies of each of our productions. Operations like add, subtract and multiply are
+somewhat simple. All of our orders of operations were handled by the parser, so all we need to be concerned with is
+the actual arithmetic we are performing. This can be something like checking if we are dealing with numeric types,
+adding the numbers, if one or more of the operands are real numbers store the result in a floating-point variable,
+and if we have strings involved do something like string concatenation instead. All of this is implementation
+specific, really.
+
+
+There are other productions we have that don't deal directly with expressions. And there are also productions that we
+are using for syntactic forms that don't necessarily make sense on their own.
+
+
+Let's look at our grammar for function definitions, a certain kind of statement.
+
+```
+<function def> ::= function <identifier> <parameters> <endl> <stmt list> end
+<parameters> ::= <epsilon>
+<parameters> ::= ( )
+<parameters> ::= (<param decl>)
+<param decl> ::= <identifier>
+<param decl> ::= <param decl>, <identifier>
+```
+
+A function definition statement has an identifier, the name of the function, an optional list of parameters or
+arguments, and a block of statements that represents the function body.
+
+
+What we need to do with this information is create a record for this function in the current scope that we are in or
+our current function closure. This record needs information about the parameter names, the function body, and our
+current scope to be stored in this record, and it will be stored under the function name. We will get the list of 
+parameter names by iterating through the \<parameters\> symbol, identifying its production number, and traversing its
+children. In this context, that would be node->children[2]. 
+
+
+Our design goals stated that we wanted to use functions as first-class objects, so we need to store them in the same
+way that we store strings, integers, and floating-points. 
+
+
+#### Part 7: The Virtual Environment
+
+#### Part 8: The Library
+
+#### Part 9: The Garbage Collector
+
+#### End Notes
 
 
 Because of how we have arranged everything, it would be trivial for us to take this language and turn it into
 something else completely. With a few tweaks to our parser grammar, we could have a programming language with the
-exact same functionality that looks like C. We might call it JavaScript. Additionally, with some additions to the
-lexer, we might begin to enforce rules on indentation. Then our language would become like Python.
+exact same functionality that looks like C. Additionally, with some additions to the lexer, we might begin to enforce
+rules on indentation. Then our language would become like Python.
 
 
 One of the great benefits to setting up our experiment this way is that it gives us complete flexibility. Earlier it
@@ -855,12 +937,32 @@ an interpreter. This just shows how interesting programming language design can 
 applications.
 
 
-#### Part 7: The VM Environment
-
-#### Part 8: The Library
-
-#### Part 9: The Garbage Collector
-
-#### End Notes
+In general though, we will begin to see the limitations of using an interpreter to execute all of our programs. The
+way we have designed our language, there's not much we can do here. One of the best things we could do would be to
+squeeze as much performance out of the backend as possible and provide our programmers with great tools and libraries
+to be productive.
 
 
+Ultimately, if we want to go deeper than that, we will need to start looking at compiler techniques. Our language has
+completely dynamic types, meaning that if we are performing even simple operations, we need to determine what types we
+are working with. If we were going to begin to compile this code, we would still have a large amount of overhead
+there. Instead of an addition becoming a single op-code, it would involve a function call that would sort all of this
+information out for us. Although this might still be significantly faster, it represents a lot of work for us as
+language designers. As an interesting exercise, it might be fun trying to cross-compile our language to another
+dynamically-typed scripting language. This offers us a bit more portability by allowing our code to run in more
+places. As part of the *Duck language* design, one intention is to allow programs to run on Desktops and on the web.
+For that reason, I implemented the *Duck interpreter* in JavaScript. This is great in concept, however it doesn't
+achieve 100% performance. A great next step would be to implement our shared libraries in JavaScript and then offer a
+way to cross-compile programs.
+
+
+Although this would be an interesting project, I'm sure that we are all wondering whether we can design our own static
+language now. One important step in a language's continuing improvement, and a step towards making it more
+independent, is the ability for it to become self-hosted. Our *Duck language* lacks the resources to write a Duck
+interpreter itself while still being useful in terms of performance. While this would certainly be possible, it would
+not be useful. Instead, we will have to start from square one for this project. Please see "**Designing a Programming
+Language: II**," the second part in this series, to see me discuss the ways we can design our own staticly typed
+language and lay out the roadmap for us to write our own compiler.
+
+
+Best of luck.

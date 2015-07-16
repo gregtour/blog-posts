@@ -1151,7 +1151,7 @@ while running do
             program = ""
         end
     loop
-    ; duck.print(duck.newline)
+    
     expr = eval(program)
     if expr or Type(expr) != 'NIL' then
         duck.print(">> ")

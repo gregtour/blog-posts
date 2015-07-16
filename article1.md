@@ -847,12 +847,12 @@ int InterpretNode(SYNTAX_TREE* node)
 
 
 Here we allow the code generator to help us somewhat by creating the jump table we will use in identifying
-productions. This isn't strictly necessary. One choice we've made here was the ability to track errors on a production
-by production basis. If we replace this logic with statement by statement errors, we can move this error checking into
-our \<stmt list\> production. Then we could track our production functions with function pointers stored in the
-abstract syntax tree. The benefit this provides is eliminating one function call for every rule definition. This could
-be a large boon for performance. Instead, we won't occupy ourselves with performance right now. There are a number of
-ways we can optimize our code and logic to provide much better performance in the future.
+productions. This isn't strictly necessary. One choice we've made here was the ability to track errors on a
+production by production basis. If we replace this logic with statement by statement errors, we can move this error
+checking into our \<stmt list\> production. Then we could track our production functions with function pointers
+stored in the abstract syntax tree. The benefit this provides is eliminating one function call for every rule
+definition. This could be a large boon for performance. Instead, we won't occupy ourselves with performance right
+now. There are a number of ways we can optimize our code and logic to provide much better performance in the future.
 
 
 The runtime itself is deceptively simple. In general, all of our computation is stored in a single global variable (a
@@ -900,14 +900,272 @@ children. In this context, that would be node->children[2].
 
 
 Our design goals stated that we wanted to use functions as first-class objects, so we need to store them in the same
-way that we store strings, integers, and floating-points. 
+way that we store strings, integers, and floating-points. As we are working with values and storing them, we will
+create our own data type for variable storage, called a VALUE type. This will be a union of all of the possible types
+we can store. So, it will have a field identifying what the object's type is, and then it will have fields for
+possible integer, floating-point, string, function or dictionary values.
+
+
+Integers and floating-point numbers can be stored directly in a VALUE. The other types need to be stored by
+reference. Strings will be allocated on the heap and then accessed as constant character pointers. Function objects,
+which store a sort of header of information, will also be stored on the heap, as well as dictionaries.
+
+
+As we said, a function object needs to be aware of its parameter names, the body of statements it contains, and
+finally, the scope in which it is declared. Statements inside the body of the function will be able to access
+variables declared around the function, but not variables from the context that the function is called from, unless
+these two scope levels intersect. In this case, the *Duck language* will use lexical scope, rather than dynamic
+scope. Later, it will be important that we consider all of the ways that these overlapping scopes can interact when
+we build the garbage collector. 
+
+
+Outside of simple manipulation of expressions and working with more complex data types, we must also be concerned
+with some of the more complicated statements we are supporting. Although assignment seems like a simple task, we need
+to be concerned both with how we structure this in our programming language's grammar and also with how we implement
+it in our language's environment. 
+
+
+Consider the case where we allow assignment to variables from expressions or from other assignments:
+
+```
+<assignment> ::= <l-value> = <assignment>
+<assignment> ::= <l-value> = <condition>
+```
+
+
+We must consider here what the definition of an l-value is. An l-value is the named variable on the left hand
+of an assignment statement. We will need a more complete definition to continue. An l-value might simply be the name
+of a global or local variable. Here the scope of a variable is determined by when it is first assigned and the scope
+of the executing code, as we have not implemented anything like declaring variables. An l-value might also be an
+index into an array or a dictionary property. In general, l-values can be used as references and references can be
+used to address l-values.
+
+
+Let's see this defined in context-free statements.
+
+```
+<l-value> ::= <identifier>
+<l-value> ::= ( <l-value> )
+<l-value> ::= <reference> . <identifier>
+<l-value> ::= <reference> [ <expr> ]
+<reference> ::= <l-value>
+<reference> ::= <reference> ( )
+<reference> ::= <reference> ( <arguments> )
+```
+
+What this shows us is that we need to work carefully to identify which member variable we are referencing in
+assignment. What we should also consider is what may make up the right hand side of assignment.
+
+
+The right hand form of assignment must be a \<condition\> or another \<assignment\> symbol. A \<condition\> is the
+highest order of expression. In fact, we have a rule stating that expressions reduce to conditions, *\<expr\> ::=
+\<condition\>*. The hierarchy then proceeds from \<condition\> symbols to \<logic\>, \<comparison\>, \<arithmetic\>,
+\<term\>, \<factor\>, and lastly the \<final\> non-terminal symbol. These are in order of increasing precedence in
+our order of operations and exist mainly to help the parser. Our definition of a \<final\> or final term is either
+a parenthesized expression, a Boolean, an integer, a float, a string, an object declaration/definition, or a
+reference, the last of which implies that a \<final\> may be an l-value.
+
+
+So, when dealing with assignment, we have more strict rules on the left-hand side than the right-hand side. In
+evaluating an assignment expression, we want to start first with the right-hand side and hopefully return with a
+result value that we can store. When dereferencing things, we can operate as we have with other expression
+productions and determine a result and store it as the gLastExpression. For an identifier, we lookup a variable using
+the identifier name. For a reference, either as a dictionary or array, we first determine the value of the reference,
+as a value object, then use that object with our identifier to retrieve the target value. Our rules for reducing
+l-values will be different. At any given time, we will only need to track a single l-value. If it is being used on
+the right hand side then this comes before being dereferenced but after being identified. On the left-hand side, it
+is possible for an l-value to reduce to an index of a reference. In this case, after we have determined the value
+to store or assign, we will evaluate this reference and hold on to the object. We will then use it as the storing
+context. If there is no reference, the context is the current level of scope. 
+
+
+To elaborate more clearly, we will use a global register gLValueIdentifier when working with named l-values. In the
+case that we are indexing an array, as in the fourth rule, we will use a register called gLValueIndex. Finally, there
+are two cases for assignment: storing a value in a variable or storing a value in a dictionary. So we must track not
+only which of these we are dealing with, but also the given scope or dictionary to use for storage. So we will
+introduce two more registers, gLValueContext and gLValueDictionary. The main concern would then be to keep these all
+straight as we proceed.
+
+
+Another complicated case might be the use of dictionaries in initialization or in statements. Arrays when initialized
+can be evaluated as a list and stored one by one. In the case of nested arrays, it is important to make sure the
+interpreter's internal registers aren't being overwritten. This is really a practical concern to our runtime. In
+general, array and dictionary initialization will behave as a series of assignments of evaluated expressions.
+Accessing and modifying dictionary elements will also be supported using our own data structures, which will be
+discussed further when considering the execution environment.
+
+
+Finally, we must consider our control statements. One of the first structures we considered when setting out to
+design and build a language was the if statement, the else statement, the for loop, and the while loop. What we did
+not mention was _else if_ statements but we will show how we can support those.
+
+
+It's best in implementing control structures to approach things from a higher level. An if-statement can behave by
+first obtaining an expression, the conditional, from interpreting part of its syntax tree. The if-body can then be
+interpreted conditionally, if this expression is "true." We need to define our own rules for Boolean logic when
+coercing values from other types. Similarly, while loops will behave in the same way, except for repeatedly
+evaluating the condition, and optionally the loop body, until the looping terminates. For loops might be the most
+complex but involve similar logic and are mostly implementation defined. 
+
+
+In discussing the syntax for an 'else if' more than the procedures of how else branches will be executed, which
+should be on about the same difficulty as our other language elements, we will have to go back to the grammar.
+
+
+One possible way of formalizing this in a context free manner is the following.
+
+```
+<if> ::= if <condition> then <endl> <stmt list> <else if>
+<else if> ::= else <endl> <stmt list> end
+<else if> ::= else <if>
+<else if> ::= end
+```
+
+Luckily for us, the way we use newlines and the phrases "then," "else," and "end" in our syntax gives us a clear
+definition as to how a sequence of if, else if, and else statements should be parsed, without ambiguity.
+
+
+Pragmatically then, we will interpret the \<else if\> node only if the condition is false. In that case, that could
+lead to either a \<stmt list\> that is always executed, an \<if\> statment this is also executed, or an empty
+production.
+
+
+That determines a large number of the ways we are set to handle all of the different kinds of statements and
+expressions in our language, but also leaves us with some loose ends in terms of how we will implement all of this.
+It would be daunting to start from scratch here, I know, so it's best to approach the construction of the interpreter
+after we already have a toolbox of resources available. This is also largely dependent on the language and tools we
+are using to fashion the interpreter. Using C with minimal libraries, we need to create a number of our own data
+types, including lists, trees, dictionaries, and hash tables.
 
 
 #### Part 7: The Virtual Environment
 
+First and foremost, we must have some idea of the data that we will be working with and manipulating in our
+language's runtime. As we have already decided, values that are used in a *duck program* must be stored with
+information about their type because of its dynamic nature. We have also discovered that the built-in types for
+integers and floating-point numbers can be passed by value, stored in a VALUE structure, and that strings, functions,
+and dictionaries must be passed by reference, as pointers in a VALUE structure. 
+
+
+In evaluating and storing information at varying levels of scope, we need a way to access and assign variables that
+have names. In this case, the simplest case, we will use a list of VALUE structures paired with string identifiers
+and label this as a CONTEXT. A CONTEXT can have a parent, which represents a higher level of scope, and so we have a
+tree of identified variables. When accessing a variable, we will continue up this chain of parents until we identify
+the value we are looking for, starting with the local scope and continuing to the global scope. 
+
+
+The dictionary and array types will be stored differently. A dictionary will be accessed as a hash table. Values used
+as indices, whether they are strings, integers, floating points, or object references, will be first used as input
+to a hash function which will find a container, and then the given value will be stored or retrieved. This offers us
+better performance as it is closer to O(1) constant time. Additionally, we can use some sort of optimization like
+this on ordinary variable retrieval for increased performance.
+
+
+An interesting case to consider is when a function is called. When this happens, anonymous expressions which are
+passed in as arguments are bound to named variables, the parameters, and a new scope is created, the function's
+closure. The parent of the function closure's context is the context or scope in which the function was declared.
+We determined this when we made the decision to use lexical scoping.
+
+
+Aside from the definitions we have for values, contexts, functions, hash tables or dictionaries as data types, there
+may be some other information that we need to access and store. As function calls are made and returned, we might
+need access to that closure or scope level. So, we should keep a callstack of functions that are currently executing.
+This also helps us for debugging runtime errors, an issue that we haven't really discussed.
+
 #### Part 8: The Library
 
+No language is useful in a real or practical way without the ability for programs to provide input and output. For
+this to happen even in the simplest of scenarios, we need to start implementing a standard library. Beyond what is
+included with the language, it would also be nice if other programmers could contribute to what we have accomplished
+by developing their own third-party libraries, so we ought to orchestrate a way in which external code can be linked
+with our programming language.
+
+
+The best way we can do this is first to expose useful functions to integrate code with our language and then to
+provide a way that native code can be called from inside our programs. One simple way to do this is to override our
+definition of a function object with additional information. By adding a field for an external function call, a
+function pointer, we can provide hooks to library functions and store them in the global namespace. Furthermore,
+with some simple manipulation, we can create our own namespace for a library by using a named scope. 
+
+
+The way that our library will interface with *the Duck language* is relatively simple. At startup, the language will
+bind libraries that are included in its distribution. During this phase, the library has the opportunity to create
+hooks for its common functions, data, and constant data. Functions are integrated by first providing a pointer to the
+procedure and then providing a list of the named parameters. As we allow for any type of object to passed as
+variables, our external code will have to retrieve VALUE objects and handle them manually.
+
+
+A function itself will take an integer argument count as its parameter and it will return an error code. Returning 
+zero indicates that there was no serious error in executing the library call. The function is able to access values,
+both from its parameters and also the runtime scope using the GetRecord command, an internal instruction to the
+interpreter. The library function is able to return results via modifying the gLastExpression register.
+
+
 #### Part 9: The Garbage Collector
+
+With all of these concerns handled, to some degree or another, we need to consider our program, the interpreter, and
+its memory footprint. In first implementing the programming language's runtime, it makes sense to override the
+default allocators, malloc and free, with our own allocator and deallocator. This allows us to track our memory
+usage and free extraneous data when our environment exits.
+
+
+This is the best way to provide memory management in the first stage of development, because all memory is
+automatically freed when the system shuts down. What it doesn't provide us, however, is any sort of guarantee that we
+will continue to have memory when running our program, because it may just continue to eat up dynamic objects and
+never return them.
+
+
+There are a number of schemes we can use to track and free dynamic objects, most of which are termed "garbage
+collectors." We want to provide our programmers with automatic memory management, so this is an area we must explore.
+There are multiple ways of handling this and we will consider their pros and cons.
+
+
+Naively, one of the best ways to free variables on demand might be reference counting. Given a dynamic object, such
+as an array, we know that when it is created it has 1 reference, which is whatever scope or temporary value it is in.
+If the value is discarded or our global register is overwritten, it has 0 references and should be freed. If it is
+assigned to a named variable, its number of references is increased, and if it is assigned to multiple named
+variables, it increases again. If the scope or context holding these references is destroyed, its reference count
+decreases, until finally, if the last reference to the object is lost, it should be destroyed or freed. 
+
+
+When working correctly, which is not something I was able to achieve, there are a number of advantages to reference
+counting as a garbage collection method. First of all, it does not require stopping execution to reclaim memory. This
+is something that happens automatically as objects come into and out of scope. It is also relatively easy to
+understand and should be simple to implement. Unfortunately, I was unable to find all of the possible edgecases where
+references were created and lost, so I was not able to test this method. This leads me to the drawbacks.
+
+
+Reference counting as a form of garbage collection requires a careful watch on when objects are destroyed. If an
+object is destroyed, all of its elements must be checked to decrement references that they may hold to other objects.
+All of the possible places where references can be made, increased, or decreased have to be handled precisely, as if
+we lose count by one, then we will either leak memory or try to free the same memory twice. Additionally, there are
+certain types of circular references that may never be freed under this scheme, although that's not a huge concern to
+look at from the start.
+
+
+Which leads us to the next form of garbage collection: the tracing garbage collector. What this method involves is,
+first holding a list of every dynamic value, every dynamic string, every context, every function, and every
+dictionary or hash table from the moment it is allocated. This doesn't have to be a list, it could be any data
+structure that allows us to find and locate elements and also iterate through each of them. What we will do is,
+occasionally as our program is running, we will stop execution. Then we will look at all of the variables that the
+currently running program has access to, including the entire callstack. This must include local variables, global
+variables, any object that references another variable, and any functions that can access a given context or closure
+when being executed. When everything that is still 'alive' is identified, we compare this with all of our
+allocations. Anything that we haven't identified is now 'dead' and can be removed from memory.
+
+
+This method has a number of pros and cons, too. It requires stopping the program occasionally, known as a 
+stop-the-world garbage collector, which can be a detriment to some applications. Additionally, it might take some
+more work upfront implementing, as it involves tracking a large number of objects and all of their interactions. 
+However, once in place it is a very effective way to free memory that is able to find dead links including circular
+references. It's also very much behind the scenes, as long as allocations are being tracked.
+
+
+The *Duck programming language* currently uses a tracing garbage collector. It is highly accurate and handles a
+number issues like dead callstacks and parameter lists rather well. One concern would be to offer better integration
+with user libraries, which is definitely one area for improvement in the future. There are also a number of ways to
+go about improving its performance by using better data structures.
+
 
 #### End Notes
 
@@ -944,8 +1202,8 @@ to be productive.
 
 
 Ultimately, if we want to go deeper than that, we will need to start looking at compiler techniques. Our language has
-completely dynamic types, meaning that if we are performing even simple operations, we need to determine what types we
-are working with. If we were going to begin to compile this code, we would still have a large amount of overhead
+completely dynamic types, meaning that if we are performing even simple operations, we need to determine what types
+we are working with. If we were going to begin to compile this code, we would still have a large amount of overhead
 there. Instead of an addition becoming a single op-code, it would involve a function call that would sort all of this
 information out for us. Although this might still be significantly faster, it represents a lot of work for us as
 language designers. As an interesting exercise, it might be fun trying to cross-compile our language to another
@@ -956,13 +1214,13 @@ achieve 100% performance. A great next step would be to implement our shared lib
 way to cross-compile programs.
 
 
-Although this would be an interesting project, I'm sure that we are all wondering whether we can design our own static
-language now. One important step in a language's continuing improvement, and a step towards making it more
+Although this would be an interesting project, I'm sure that we are all wondering whether we can design our own
+static language now. One important step in a language's continuing improvement, and a step towards making it more
 independent, is the ability for it to become self-hosted. Our *Duck language* lacks the resources to write a Duck
 interpreter itself while still being useful in terms of performance. While this would certainly be possible, it would
 not be useful. Instead, we will have to start from square one for this project. Please see "**Designing a Programming
-Language: II**," the second part in this series, to see me discuss the ways we can design our own staticly typed
-language and lay out the roadmap for us to write our own compiler.
+Language: II**," the second part in this series, to see me discuss the ways we can design our own statically typed
+language and lay out the road map for us to write our own compiler.
 
 
 Best of luck.

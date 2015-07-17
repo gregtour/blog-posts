@@ -881,6 +881,13 @@ int InterpretNode(SYNTAX_TREE* node)
         case 0x0A: return ReduceStmtC(node);
 
         ...
+        case 0x74: return ReduceBooleanA(node);
+        case 0x75: return ReduceBooleanB(node);
+    default:
+        printf("Unknown production %i.\n", node->production);
+        return 1;
+    }
+}
 ```
 
 

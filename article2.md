@@ -39,7 +39,7 @@ interpreter, this time we will build a compiler for x86 computers.
 Part of the purpose of this study on programming languages is to find out what the best method and practice for
 building a do-it-yourself language is without getting bogged down in research. While we always like to make our
 lives easier, we are choosing to create almost everything from scratch. We want our code to be self-reliant and we
-want to to be able to claim ownership to everything we have written and built. We also need the option of distributing
+want to be able to claim ownership to everything we have written and built. We also need the option of distributing
 our software ourselves, and if we are responsible for handcrafting all of the components to our programming language,
 this gives us an understanding of the details well enough then that we can provide implementations for any platform.
 
@@ -67,7 +67,8 @@ syntax of our language, if we need to make broad changes.
 
 #### Part 3: First Steps
 
-Let's outline the structure and grammar of our programming language. Having already discussed the concerns of language design (to a small degree) in the first segment, we can sort of brush over or breeze through some of the larger parts
+Let's outline the structure and grammar of our programming language. Having already discussed the concerns of language
+design (to a small degree) in the first segment, we can sort of brush over or breeze through some of the larger parts
 of this design without having to do an excessive amount of clarification. Luckily, we also won't discuss technical
 problems with the frontend, like constructing our parser-generator. Instead, all of our technical work will be on the
 backend.
@@ -282,8 +283,8 @@ From a high-level view, we can describe the way our compiler will operate.
 Given a source file, the compiler will produce an executable that we can run on our system. We will include the linker
 as part of the compiler, because we only intend to use two standard built-in functions. Because we don't intend to
 write an assembler ourselves, we might as well say that our compiler will produce assembly for our executable. In
-reality, our compiler will use such a small subset of intstructions that it would be very easy for us to include the
-assembler functionality as well, but that leaves us with a number of abritrary and obscure concerns for each platform
+reality, our compiler will use such a small subset of instructions that it would be very easy for us to include the
+assembler functionality as well, but that leaves us with a number of arbitrary and obscure concerns for each platform
 that we would rather avoid.
 
 So, our compiler will convert source code to target assembly. In the process, we will go from source code to an
@@ -310,7 +311,8 @@ it because this is cleaner from an implementation perspective. For our purposes,
 which we will duplicate across two modules to use the same processing scheme twice. The first will be for the static
 analyzer and the second will be for the intermediate code generator. 
 
-Given that after parsing we know our source code is well-formed, the only task we have is to ensure that our types are correct. Again, using multiple passes aids us in performing this work. In our first pass, we will identify all
+Given that after parsing we know our source code is well-formed, the only task we have is to ensure that our types are
+correct. Again, using multiple passes aids us in performing this work. In our first pass, we will identify all
 variable and function  declarations and record their types. If a variable or function is defined in the same scope
 with an identical name, our static analysis phase will fail and report the error. We can also determine that variables
 are only declared as integer types, as they cannot be null.
@@ -335,7 +337,7 @@ of these options.
 
 The intermediate representation in a compiler is in general a simplified language of instructions for a program. It
 moves from being a structured representation in a parse tree to being less structured as either a stream of
-instructions or a directed graph. The psuedocode instructions that we use will also be important.
+instructions or a directed graph. The pseudocode instructions that we use will also be important.
 
 As we break up instructions and expressions into a simple operations, there will be a number of temporary variables or
 temporary values along the way. Consider the case of adding three variables and storing the result in another
@@ -362,7 +364,7 @@ parameters to functions, and where function parameters become complex expression
 
 For some architectures, like MIPS or PowerPC, which use a reduced instruction set, there are often a large number of 
 registers to assign to and from. This could be useful for evaluating large expressions. If we have fewer than 16 or 32
-different temporary variables or vlaues, we would simply store them in one of these registers before using them.
+different temporary variables or values, we would simply store them in one of these registers before using them.
 
 We aren't targeting a reduced instruction set (RISC) computer, though. We're targeting x86 assembly. In the case that
 we are making a 32-bit executable, that leaves us with 8 registers we can use, and in the case of 64-programs that
@@ -374,7 +376,7 @@ naming variables would take time and effort.
 
 Therefore, we will choose to use the second form, which is an anonymous stack-based representation.
 
-Rewriting this pseudocode in a more simplified and more intelligble form this would be:
+Rewriting this pseudocode in a more simplified and more intelligible form this would be:
 ```
 PUSH A
 PUSH B
@@ -402,7 +404,7 @@ need. Given our arithmetic and conditional logic expressions we will want stack 
 GREATER THAN, COMPARE LESS THAN OR EQUAL, COMPARE GREATER THAN OR EQUAL
 
 Each of these will consume one or two parameters from the stack (popping off the stack) and produce one result
-(pushing on to the stack). Given that some of our logic expressions in comparision are duplicitous, we will remove
+(pushing on to the stack). Given that some of our logic expressions in comparison are duplicitous, we will remove
 some of them to simplify and build them from composite statements.
 
 So instead we will have:
@@ -438,13 +440,13 @@ For these we will implement the instructions
 
 Which will branch to labels unconditionally, or if the value on the stack is zero.
 
-We will also need a form of labels, so we will add the psuedo-instruction
+We will also need a form of labels, so we will add the pseudo-instruction
 
 > LABEL
 
 which will take a unique ID as a parameter, which we will generate when generating our intermediate representation.
 
-Here we've outlined one of the simplest intermediate reperesentations imaginable. What we will do is process each
+Here we've outlined one of the simplest intermediate representations imaginable. What we will do is process each
 function individually, creating a stream of IR instructions that match the given function on a statement by statement
 level. Our code generator will then be able to work from these function blocks to create the assembly code that we
 need. This IR representation is also flexible enough that we could easily add other target platforms to our compiler,
@@ -454,7 +456,8 @@ optimizations, but we will save this as a tertiary concern.
 Let's implement instructions then.
 
 Given our boiler plate code, we can emit IR code on a production by production basis. As we are operating on function
-bodies, we can start at a block level. Recalling that our instruction `<block>`'s are either `<fstmt>`'s or `<fstmt*>`'s, we should provide IR generation for each kind of `<fstmt>`.
+bodies, we can start at a block level. Recalling that our instruction `<block>`'s are either `<fstmt>`'s or
+`<fstmt*>`'s, we should provide IR generation for each kind of `<fstmt>`.
 
 ```
 <fstmt> ::= <type-declaration> ;

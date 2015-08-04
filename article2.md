@@ -14,8 +14,8 @@ count(i: int): void
 {
   if (i > 0)
   {
-    count(i - 1)
-    printi(i)
+    count(i - 1);
+    printi(i);
   }
 }
 ```
@@ -319,20 +319,12 @@ our motivation.
 So, given the design of our language, let us consider what operations our stack-based intermediate representation will
 need. Given our arithmetic and conditional logic expressions we will want stack operations for all of the following:
 
-> NOT, MINUS, AND, OR, ADD, SUB, MULTIPLY, DIVIDE, MODULUS, COMPARE EQUAL, COMPARE UNEQUAL, COMPARE LESS THAN, COMPARE
-GREATER THAN, COMPARE LESS THAN OR EQUAL, COMPARE GREATER THAN OR EQUAL
+> NOT, MINUS, AND, OR, ADD, SUBTRACT, MULTIPLY, DIVIDE, MODULUS, CMP EQUAL, CMP LESS, CMP GREATER
 
-Each of these will consume one or two parameters from the stack (popping off the stack) and produce one result
-(pushing on to the stack). Given that some of our logic expressions in comparison are duplicitous, we will remove
-some of them to simplify and build them from composite statements.
-
-So instead we will have:
-
-> NOT, MINUS, AND, OR, ADD, SUB, MULTIPLY, DIVIDE, MODULUS, COMPARE EQUAL, COMPARE LESS THAN, COMPARE GREATER THAN
-
-Using our NOT operation, we can implement the other three comparisons with a single extra stack instruction.
-
-This basically covers the implementation of all of our basic expression rules.
+Each of these will consume one or two parameters from the stack (popping off of the stack) and produce one result
+(pushing onto the stack). This basically covers the implementation of all of our basic expression rules. In the case
+of comparing inequality, testing if values are greater than or equal, or testing if values are less than or equal,
+we will use the operations CMP EQUAL, CMP LESS, or CMP GREATER followed by a NOT operation to negate the result.
 
 To cover assignment statements and retrieving values from variables we will add stack instructions for
 

@@ -183,90 +183,6 @@ You can see we are already making concessions to remove complexity from our lang
 useful, they aren't strictly necessary as they offer no additional functionality over while loops and require more
 effort for us to implement as language features, so we will forgo implementing them for now.
 
-Alternatively, we have included support for both if and else statements, and the phrasing of our grammar allows for
-else-if statements to occur. Not only that, but with our optional inline syntax, allowing `<block>`'s to take on the
-form of a single statement, there are ambiguous parsings for our if, if-else, else, and else-if statements.
-
-Originally, we said this was something we wanted to avoid, so that we could have a deterministic parsing for our
-source. However, here we will recognize that our parser will by default match these with their innermost parsings, due
-to the design of how our parser resolves conflicts. 
-
-This is fine, but this is also how every other language operates. Additionally, it doesn't necessarily make more sense
-than the alternatives. Consider the following code, indented to show how a naïve language or parser would match these
-statements.
-
-```
-{
-if (check_condition)
-    if (condition)
-        a();
-    else
-        b();
-}
-```
-
-In this case, in a language like C or Java, the functions a or b would only be called if `check_condition` were true,
-and then the result would be determined by `condition`. What if, however, we have behavior that we only want to run
-if our condition is true and the value of check_condition is true, and we want to run another function if 
-check_condition is false.
-
-Then, the proper way to implement this would be:
-```
-{
-if (check_condition) {
-    if (condition)
-        a();
-    } else
-        b();
-}
-```
-
-If we determine we want to reverse these parsing rules, we can define our own 'correct' form for this based on our
-definition. That is what we will choose to do here. In this case, the default behavior for the original code sample
-would be, with indentation showing the parsed form, this.
-
-```
-{
-if (check_condition)
-    if (condition)
-        a();
-else
-    b();
-}
-```
-
-In this case, matching dangling else clauses with the outermost matching if, the way to express the same functionality
-as our original example, as it would operate in C or Java, would be:
-
-```
-{
-if (check_condition) {
-    if (condition)
-        a();
-else
-    b();
-}
-}
-```
-
-In any case, we allow for either behavior to be supported, it just depends on the semantics of how it is expressed.
-Additionally it should be noted that issues like these don't arise if one uses the best practices in their code in the
-first place, not allowing for any ambiguity in the expression of logical statements.
-
-This instead becomes a unique design decision.
-
-As was said, our parser will still naïvely produce parse trees in the C-style form. In order to remedy this, we will
-need to process our abstract syntax tree and operate on it to re-structure if-statements. While possibly a bit
-difficult, it's good for us to begin understanding how we might manipulate our source code on a macro level, before it
-has been processed for static runtime concerns and before we have begun to form an intermediate representation or
-done any code generation.
-
-In order to do this, we will traverse the AST or syntax tree. For each node, we will first process the node itself and
-then process any children. We will first identify if-statements that are lacking an else-clause. In this case, the
-else clause will reduce to `<epsilon>`. Then we will traverse the inner code-block and find any else-clauses that
-could be re-paired with our outside production. In this case, we will only study inline if-statements, where the code
-inside reduces to a single statement.
-
 Returning to the syntax of our language, our other concerns are the types allowed in our type system, and the
 definition of `<final>` statements. As was said before, we will only allow integer types in our language. Our
 functions may not return variables, so we will also have a named void type as well.
@@ -318,34 +234,19 @@ analysis involves analyzing the source code from our context-free language and m
 as the right types. Usually this involves checking that variables or functions are defined before they are used,
 however this is really unnecessary for us. Instead, we will just make sure that they are only defined once.
 
-As we are compiling and analyzing our code *before* it is being run, we have the advantage of being able to study the
-entire program before generating code. For this reason, it would be just as convenient for us to declare variables at
-the end of a function as at the beginning, and why not, because it creates just as interesting of a coding style. (Our
-language will have a lot of charm for being rather simple.)
+The easiest way for us to do this is on a statement-by-statement basis. First, we will process each type declaration
+statement and each function definition. These will be stored in records in the compiler. Only one declaraction is
+allowed for a given name in a specific scope, so if there are any duplicate entries this should produce an error.
 
-Remember, our parser generator is capable of creating boiler-plate code for us. This means it can create a skeleton
-framework for any operations we want to perform on a per-node basis for us. This is similar to how other free tools
-work, for generating parsers, but we will separate the steps of defining a language and providing implementation for
-it because this is cleaner from an implementation perspective. For our purposes, we will generate our boiler code
-which we will duplicate across two modules to use the same processing scheme twice. The first will be for the static
-analyzer and the second will be for the intermediate code generator. 
+Function declarations are stored in their own table of records containing information about the function's name, its
+return type, its parameters, and the function body. The parameters must be enumerated and their types determined at
+this phase. Parameter names must not be duplicated, so this is another error case. 
 
-Given that after parsing we know our source code is well-formed, the only task we have is to ensure that our types are
-correct. Again, using multiple passes aids us in performing this work. In our first pass, we will identify all
-variable and function  declarations and record their types. If a variable or function is defined in the same scope
-with an identical name, our static analysis phase will fail and report the error. We can also determine that variables
-are only declared as integer types, as they cannot be null.
-
-In the second phase, we will identify if all variables are used with their proper types. Given our restraints, this
-boils down to checking that all function calls used as expressions must return an integer if their result is used. We
-will also check that functions are called with the proper number of arguments and that the arguments are of matching
-types.
-
-Again, by limiting ourselves to a single type, this drastically decreases the amount of work we need to do when
-checking types.
-
-This completes type-checking and leaves us with some static information about our program. Specifically, the names and
-locations of variables and functions and their types.
+Finally, we will check the types of values in expressions. For each expression, we will compare the types of its
+inputs. We will also compare the types of and counts of function arguments. Void values, from functions that have no
+return value, must not be combined with other values in any operation. Assignment statements must assign an integer
+value to a variable. After checking all of these error cases, then we know that the program's syntax and expressions
+are valid and the type checker is finished.
 
 #### Part 5: The Intermediate Representation
 
@@ -559,3 +460,12 @@ Using peephole optimizations, we may be able to better generate code from this I
 
 
 
+#### Part 6: Trivial Code Generation
+#### Part 7: Advanced Code Generation
+
+#### Part 8: Standard Library
+```
+print
+printi
+```
+input

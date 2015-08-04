@@ -235,7 +235,7 @@ as the right types. Usually this involves checking that variables or functions a
 however this is really unnecessary for us. Instead, we will just make sure that they are only defined once.
 
 The easiest way for us to do this is on a statement-by-statement basis. First, we will process each type declaration
-statement and each function definition. These will be stored in records in the compiler. Only one declaraction is
+statement and each function definition. These will be stored in records in the compiler. Only one declaration is
 allowed for a given name in a specific scope, so if there are any duplicate entries this should produce an error.
 
 Function declarations are stored in their own table of records containing information about the function's name, its

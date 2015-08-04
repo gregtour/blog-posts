@@ -1,6 +1,25 @@
 ### Designing a Programming Language: II
 > ![Duck-logo](small.png?raw=true "Duck programming language logo")  Designing a minimal compiler from simple steps.
 
+#### Part 0: Designing a Compiler
+
+```C
+main: void 
+{
+  print("How to write a compiler.")
+  count(3);
+}
+
+count(i: int): int
+{
+  if (i > 0)
+  {
+    count(i - 1)
+    printi(i)
+  }
+  return i;
+}
+```
 
 
 #### Part 1: The Premise

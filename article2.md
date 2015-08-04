@@ -347,7 +347,7 @@ checking types.
 This completes type-checking and leaves us with some static information about our program. Specifically, the names and
 locations of variables and functions and their types.
 
-#### Part 5: Intermediate Code Generation
+#### Part 5: The Intermediate Representation
 
 This next step becomes important in moving closer to our running executable. We need to take the program that we have
 parsed and analyzed and convert it to a form that is closer to machine code. There are a number of ways to do this 
@@ -390,8 +390,8 @@ we are making a 32-bit executable, that leaves us with 8 registers we can use, a
 gives us at most 16 registers. This is including some special purpose registers that we don't want to assign to.
 
 Still, introducing new temporary variables could be logical, considering that we will be storing variables on the 
-stack in our program, and we can reference them there. However, when generating code, counting off, enumerating, or
-naming variables would take time and effort.
+stack in our program, and we can reference them there. However, when generating intermediate code, counting off,
+enumerating, or naming variables would take extra time and effort.
 
 Therefore, we will choose to use the second form, which is an anonymous stack-based representation.
 
@@ -491,3 +491,71 @@ bodies, we can start at a block level. Recalling that our instruction `<block>`'
 <fstmt> ::= continue ; 
 <fstmt> ::= return <expr> ;
 ```
+
+...
+...
+
+#### Part 6: Code Generation
+
+We have two choices when generating assembly code from our intermediate representation. The first would be a literal
+translation and the second would be a recompilation. Given that our x86 target platform is a complex instruction set
+computer, it can undoubtedly emulate all of the instructions that we are using in our intermediate representation.
+That is part of why we chose it. On the other hand, directly translating our program as a set of stack-based 
+instructions would hardly be as efficient as what we intended in compiling our source code.
+
+Let's look at the instruction model of an x86-32 computer processor.
+
+Our code and examples will use Intel style syntax for assembly.
+
+We have eight 32-bit registers at our disposal. Namely
+```
+EAX EBX ECX EDX
+ESI EDI EBP ESP
+```
+
+Let's outline the most important of these, foremost. EAX is the accumulator register and is used for returning values
+from functions. ESP is the stack-pointer and will be used to track function parameters and local variables in a 
+function call. Furthermore, EBP will also be used to manage stack addresses. We will consider the other 5 as being
+general purpose registers for the moment. 
+
+In 32-bit assembly on an x86 processor, parameters are passed to functions on the program's stack. Additionally the
+stack is used for holding local variables. If a function is called with 4 long int local variables, each taking up
+4-bytes of memory, then the stack pointer is subtracted by 16 to represent this memory, and assuming EBP points to the
+top of the stack at the beginning of the function, these local variables are accessed with offsets from this address
+in memory.
+
+One of the most difficult tasks in writing a compiler backend is determining register assignment. We will attempt to
+find a simple way to assign registers to each of our values.
+
+If we were to provide a direct translation for our IR code to x86 assembly, it would take us only a few instructions
+per IR opcode to accomplish. We could even limit ourselves to only using 3 registers if we had to. Obviously, this
+wouldn't be using our computing resources to their full advantage.
+
+Instead of viewing our machine as a stack-based computer, let's return again to thinking of a machine with registers
+and a stack. Instead of thinking of the stack as something that grows and shrinks, as we generate code on a
+function-by-function basis we will think of the actual stack as being fixed and we will instead think about local and
+global values. If all we needed in performing operations for computation was the space allocated in local variables,
+our job would be very easy. Instead, we must also consider the temporary storage space required. That's what led us
+to design our IR representation as we did, to avoid naming the temporary variables we created.
+
+Taking advantage of the fact that we know our IR code should be flat, with no changes in the size of the stack from
+the beginning to end, we can perform a simple task to find out the maximum amount of local storage space we will need
+to execute this function. We will start from the beginning with a count of 0 and consider each possible code path
+individually, continuing from the beginning of the function to the end, and increase our count whenever we encounter
+a push instruction and decrease it when we encounter a pop instruction. When we determine the maximum size of our
+stack, that is the amount of temporary storage we will need, and we will add the amount of named storage to find the
+total amount of space that we need on the stack.
+
+Then, as we go about generating code for operations, we will internally to the compiler track a stack position that
+represents the index in this virtual stack machine. An operation like ADD will result in an instruction that takes two
+local variables and stores them in another.
+
+Being that we are writing a compiler for x86, we will also need to consider the assembly writing conventions for this
+architecture, and factor that in to register assignment. It's possible that, given many of our operations need to take
+place in the EAX register, that we can save some transfers between registers. We also have the option to use EBX, ECX,
+and EDX as additional temporary storage.
+
+Using peephole optimizations, we may be able to better generate code from this IR representation that we have internally.
+
+
+

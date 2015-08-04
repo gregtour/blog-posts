@@ -259,7 +259,7 @@ The intermediate representation in a compiler is in general a simplified languag
 moves from being a structured representation in a parse tree to being less structured as either a stream of
 instructions or a directed graph. The pseudocode instructions that we use will also be important.
 
-As we break up instructions and expressions into a simple operations, there will be a number of temporary variables or
+As we break up instructions and expressions into simple operations, there will be a number of temporary variables or
 temporary values along the way. Consider the case of adding three variables and storing the result in another
 variable. As we break this up into two additions and an assignment, we can choose a representation that introduces
 named values or one that does not. In an example, we would see:
@@ -456,7 +456,8 @@ architecture, and factor that in to register assignment. It's possible that, giv
 place in the EAX register, that we can save some transfers between registers. We also have the option to use EBX, ECX,
 and EDX as additional temporary storage.
 
-Using peephole optimizations, we may be able to better generate code from this IR representation that we have internally.
+Using peephole optimizations, we may be able to better generate code from this IR representation that we have
+internally.
 
 
 

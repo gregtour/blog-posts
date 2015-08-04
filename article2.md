@@ -10,14 +10,13 @@ main: void
   count(3);
 }
 
-count(i: int): int
+count(i: int): void
 {
   if (i > 0)
   {
     count(i - 1)
     printi(i)
   }
-  return i;
 }
 ```
 

@@ -19,7 +19,7 @@ language in terms of its grammatical structure and fleshed out its core design a
 continued from developing a lexer and parser into building a dynamic interpreter. This gave us a lot of power in terms
 of determining events at runtime, such as the value of variables or expressions, which might otherwise be determined
 at compile time. It also allowed us to forgo any sort of advanced type checking when parsing our source code and
-instead delayed that until evaluating expressions. This made things easier to develop but also skipped out on a number
+instead delayed that until evaluating expressions. This made things easier to develop but also skimmed out a number
 of static guarantees that we might have been able to make about our program. It also provides our programmer with
 little assurance that a given program will operate as expected, besides being able to be parsed.
 
@@ -33,45 +33,48 @@ Instead of working with dynamic language features, we will limit ourselves to st
 type system, we will opt to use strong typing. And while our initial project resulted in us building a language
 interpreter, this time we will build a compiler for x86 computers. 
 
+
 #### Part 2: Motivations
 
-Part of the purpose of this study on programming languages is to find out the best method and practice for building a
-DIY language without being bogged down in academic research. While we always like to make our lives easier, we are
-opting to create almost everything from scratch because we want our code to be self-reliant and also because it is
-easier to claim ownership of everything we have written, we have the option of distributing it ourselves, and we have
-an understanding of the details well enough then that we can implement our system for any platform that need to.
+Part of the purpose of this study on programming languages is to find out what the best method and practice for
+building a do-it-yourself language is without getting bogged down in research. While we always like to make our
+lives easier, we are choosing to create almost everything from scratch. We want our code to be self-reliant and we
+want to to be able to claim ownership to everything we have written and built. We also need the option of distributing
+our software ourselves, and if we are responsible for handcrafting all of the components to our programming language,
+this gives us an understanding of the details well enough then that we can provide implementations for any platform.
 
-Our target audience is still really general; we want to include as many developers as possible. Still, we don't want
-to dumb down any material so we will attempt to explain things at just the level that it requires.
+Our target audience is still relatively general; we want to include as many developers as possible. Still, we don't
+want to dumb down any material so we will attempt to explain things at just the level that is necessary.
 
 There are a number of tools and resources that we developed in the first part of this series, in developing the *Duck 
-programming language* that we will continue to use for this project. This gives us somewhere to start and provides us
-with familiar tools that we can use. What we will be building from includes: the lexer, the parser generator, and the
-parser. Although we might need to make subtle modifications, we can generally use these parts as-is.
+programming language*, that we will continue to use for this project. This gives us somewhere to start from and
+provides us with familiar tools that we can use. What we will be building from includes: the Duck lexer, the parser
+generator, and the parser. Although we might need to make subtle modifications, we can generally use these parts
+as-is.
 
 We should also define the scope of our project. In the first half, we expected to make a general programming language:
 a language that would be well suited for any task. That is a perfect goal when dealing with a project that has no 
 constraints. Here, we are looking to complete our task as soon as possible so that we can reflect on the method that
 we used, provide improvements, and move on to other projects, so we are going to cut-back on the scale significantly.
-This also gives us the options to make drastic modifications or change the scope of what we are doing to match our
-needs. 
+This also gives us the option to make drastic modifications or change the scope of what we are doing later on.
 
 For this reason, we will be making a compiler for a language that only operates on integer types. We will provide no
 support for objects (or object oriented programming) and instead only implement a simple imperative language. The
-fewer syntactic features we provide, the smaller our resulting codebase can be. We will still use a generalized LR
-parser/parser generator, because it allows us to make arbitrary changes, especially down the road. It makes it easier
-for us to make broad expansions. 
+fewer syntactic features we provide, the smaller our resulting code will be, and the more we can analyze our results.
+We will still use a generalized LR parser/parser generator, because it allows us to make arbitrary changes to the
+syntax of our language, if we need to make broad changes.
+
 
 #### Part 3: First Steps
 
-Let's outline the structure and grammar of our programming language. Having discussed many of the concerns of language
-design, we can sort of brush over or breeze through some of the larger parts of this design without having to do
-an excessive amount of clarification. Luckily, we also won't discuss technical problems with the frontend, like
-constructing our parser-generator. Instead, all of our technical work will be on the backend.
+Let's outline the structure and grammar of our programming language. Having already discussed the concerns of language design (to a small degree) in the first segment, we can sort of brush over or breeze through some of the larger parts
+of this design without having to do an excessive amount of clarification. Luckily, we also won't discuss technical
+problems with the frontend, like constructing our parser-generator. Instead, all of our technical work will be on the
+backend.
 
 First of all, we will support the same operations in logic and arithmetic that our earlier programming language
-supported, and we will offer support for the same orders of operation. To remind, the CFG (context-free grammar) form
-of this looked like the following:
+supported, the *Duck programming language*, and we will offer support for the same orders of operation. To remind, the
+CFG (context-free grammar) form of this syntax looked like the following.
 
 ```
 <expr> ::= <condition>
@@ -102,17 +105,17 @@ of this looked like the following:
 This gives us a rudimentary expression type grammar for combining `final` elements into arithmetical or combinational
 logic statements. We will use these expressions at the core of our language.
 
-For the main structure of our language, we will defined a source program as being a sequence of top-level statements.
-Our statements can either be include statements, which define other source files to include on a literal level, type
-declarations which define static variables, and function definitions.
+For the main structure of our language, we will define a source program as being a sequence of top-level statements.
+Our statements can either be include statements, which define other source files to include on a literal level,
+type-declarations, which define static variables, or function definitions.
 
 The program's execution will start with the function declared with the identifier `main`. Otherwise, functions will
 have arbitrary identifier names. As a sort of creative syntax, we will be formatting our programs in a way that's
-similar to C or Java, but instead of declaring types before identifiers, we will declare them after, separated by a :
-colon symbol. Our statements will be delimited by semicolons, and unlike our predecessor language, we will be ignoring
+similar to C or Java, but instead of declaring types before identifiers, we will declare them after, separated by a
+colon ':'. Our statements will be delimited by semicolons, and unlike our previous language, we will be ignoring
 whitespace like newlines. 
 
-Then from a top-level our grammar looks like:
+Then from an above view our grammar looks like this:
 
 ```
 <program> ::= <gstmt*>
@@ -456,7 +459,6 @@ bodies, we can start at a block level. Recalling that our instruction `<block>`'
 ```
 <fstmt> ::= <type-declaration> ;
 <fstmt> ::= <identifier> = <expr> ;
-<fstmt> ::= <identifier> [ <expr> ] = <expr> ;
 <fstmt> ::= <expr> ;
 <fstmt> ::= if ( <expr> ) <block> <else>
 <else> ::= else <block>

@@ -136,7 +136,7 @@ function our_new_function(parameter1, parameters2)
     ; here we have statements that do work
     ; if this function returns a value then we might have
     
-    ; return ourResult
+    return ourResult
     
     ; at the end
 
@@ -316,7 +316,7 @@ identify the tokens that make up _Duck source code_.
 
 At this point, we already have tables of keywords and symbols to begin with, and if we don't, it is something that we
 will generate in one of the next steps that we can save and store for use in the lexer. In any case, we can list off
-all of the keywords and symbols that we would like to use for your programming language. In this case those keywords
+all of the keywords and symbols that we would like to use for our programming language. In this case those keywords
 are:
 
 > import, include, return, break, continue, throw, function, end, if, then, else, for, to, do, loop, step, in, while,

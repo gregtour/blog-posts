@@ -20,12 +20,6 @@ relevant scope leads to a syntax error issued at compile time. The programming l
 that, when it is analyzed at a source level, the locations of all variables and functions are known by lexical
 address: i.e. given the relevant scope, a variable can be identified by the order it is defined in.
 
-
-```JavaScript
-var num1, num2;
-var text;
-```
-
 As an example, consider the case of declaring variables in Java:
 ```Java
 int num1, num2;

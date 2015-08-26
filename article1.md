@@ -1,7 +1,7 @@
 ### Designing a Programming Language: I
 
 > ![Duck-logo](small.png?raw=true "Duck programming language logo")  Designing a language and building an interpreter
-from concept to evolution.
+from beginning to end.
 
 
 
@@ -21,33 +21,35 @@ that, when it is analyzed at a source level, the locations of all variables and 
 address: i.e. given the relevant scope, a variable can be identified by the order it is defined in.
 
 
-As an example, consider the case of defining a variable in Visual Basic:
-```vb
-Dim num1, num2 As Integer
-Dim text As String
-```
-
-
-This would be the prototype for a static language. When variables are first declared, they must be paired with a
-type. In order to compare with a dynamically typed language, let us look at an example from ECMA script or
-JavaScript.
-
-
-```javascript
+```JavaScript
 var num1, num2;
 var text;
 ```
 
+As an example, consider the case of declaring variables in Java:
+```Java
+int num1, num2;
+String text;
+```
 
-In this example, no types are declared for these variables. The variable 'num1' could be used as any type by
-assigning any value to it. Additionally, the declaration step is wholly unnecessary. The way that values are stored
-includes the type information.
+
+This would be the prototype for a static language. When variables are first declared, they must be paired with a 
+type. In order to compare with a dynamically typed language, let's look at an example from Python.
+
+```Python
+global num1, num2
+global text
+```
+
+In this example, no types are declared for these variables. The variable 'num1' could be used as any type by assigning 
+any value to it. Additionally, the declaration step is wholly unnecessary. The way that values are stored includes type 
+information, so declarations are only needed when declaring scope.
 
 
-Additional examples of dynamically typed languages besides JavaScript include Python, Ruby, Lua, Scheme and Lisp, and
-a number of others. Aside from the style of syntax and the degree of expressiveness, these programming languages are
-largely similar because of their type system. So called dynamically typed languages are sometimes referred to as
-duck-typed or duck languages.
+Additional examples of dynamically typed languages besides Python include JavaScript, Ruby, Lua, Clojure, Scheme and Lisp, 
+and a number of others. Aside from the style of syntax and the degree of expressiveness, these programming languages are 
+largely similar because of their type system. So called dynamically typed languages are sometimes referred to as duck-typed 
+or duck languages.
 
 
 Adopting many of these identifying features, and really as an exercise in constructing a language from basic parts,
@@ -95,10 +97,10 @@ is a statement that contains additional statements.
 
 To provide a little bit of framework to work from, let's write down what some of these ideas might look like.
 
-```
+```Duck
 if some condition then
 
-    here is a block of statements
+    ; here is a block of statements
     
 end
 ```
@@ -106,16 +108,16 @@ end
 This is what our basic if statement looks like. Considering that we will often want to execute statements if our
 condition is false, we better add support for else statements, too.
 
-```
+```Duck
 if some condition then
 
-    here is a block of statements
-    to run if the condition is true
+    ; here is a block of statements
+    ; to run if the condition is true
 
 else
 
-    here is a block of statements
-    to run if the condition is false
+    ; here is a block of statements
+    ; to run if the condition is false
     
 end
 ```
@@ -134,15 +136,15 @@ As before we introduced the idea of a function definition, or a function declara
 like.
 
 
-```
+```Duck
 function our_new_function(parameter1, parameters2)
 
-    here we have statements that do work
-    if this function returns a value then we might have
+    ; here we have statements that do work
+    ; if this function returns a value then we might have
     
-    return ourResult
+    ; return ourResult
     
-    at the end
+    ; at the end
 
 end
 ```
@@ -166,10 +168,10 @@ integers, or possibly floating-point numbers, but always increasing by increment
 
 Our for loop syntax.
 
-```
+```Duck
 for j = 1 to 100 do
 
-    this prints the numbers 1 through 100
+    ; this prints the numbers 1 through 100
     println(j)
 
 loop
@@ -179,7 +181,7 @@ loop
 
 Our while loop syntax.
 
-```
+```Duck
 while running do
 
     println("still running")
@@ -200,7 +202,7 @@ to be used as indices. Furthermore, let's create dictionary types with a familia
 similar to classes or structs from related languages. To increase flexibility, these will be the same object
 internally as arrays, and the syntax for each can be used interchangeably.
 
-```
+```Duck
     arr1 = []
     arr2 = [1, 2, 3, 4]
     dict2 = {firstArray: arr1, secondArray: arr2}
@@ -231,7 +233,7 @@ Roughly this is a description of the language we intend to create.
 A casual reader following along might not be interested in developing their own language, as of this moment. They
 might be more interested in the mechanics involved. As a rather elaborate exercise, I invite anyone to attempt to
 create their own interpreted programming language. That being said, I am about to outline the process
-and tools that I used to create _the duck programming language_, even though I recognize there are multiple ways to
+and tools that I used to create _the Duck programming language_, even though I recognize there are multiple ways to
 go about the process. 
 
 
@@ -246,14 +248,13 @@ Scheme. I know that a number of courses teach programming languages by implement
 What we are doing is not far off from that except for large differences in style and syntax. And usually these
 courses require writing the language interpreter in the language itself, or involve a similar kind of task. The
 reason I would recommend staying away from this course is because it begins to lead to deliberately impractical
-solutions. The performance you can get from a self-hosted environment is really only half-way there, and any of the
-benefits of the solution we are creating tend to get taken away. Forging special frontends for a language can be very
-useful, and there are ways to improve productivity and performance by creating a special dialect, but what we are
-going for is an entirely new language.
+solutions. Fashioning a language in its own code is a rather desperate situation. Forging special frontends for a 
+language can be very useful, and there are ways to improve productivity and performance by creating a special dialect, 
+but what we are going for is a new language.
 
 
 I will note that there is one way that implementing this dynamic language in an interpreted or scripting language
-might be helpful, and that would be in the case of cross-compiling. I.e. having our _duck code_ reduced to some other
+might be helpful, and that would be in the case of cross-compiling. I.e. having our _Duck code_ reduced to some other
 language, like JavaScript or Python, before being executed. That would be fine but then we are dealing with code 
 compiling and other complexities which are best addressed in section II of this series.
 
@@ -320,7 +321,7 @@ identify the tokens that make up _Duck source code_.
 
 
 At this point, we already have tables of keywords and symbols to begin with, and if we don't, it is something that we
-will generate in one of the next steps that we can save and store to use for the lexer. In any case, we can list off
+will generate in one of the next steps that we can save and store for use in the lexer. In any case, we can list off
 all of the keywords and symbols that we would like to use for your programming language. In this case those keywords
 are:
 
@@ -414,7 +415,7 @@ deterministic language. But we are looking for a more sure-footed answer than th
 There are a class of languages known as context-free languages which we will focus on. Context-free languages are the
 class of languages that can be recognized or generated by a context-free grammar. This applies to us as we will most
 likely be writing our programming language as a context-free language, or something close it. In any case, we will be
-combining the power of our lexer, our parser, and any processing we might do after parsing to form our programming
+combining the power of our lexer, our parser, and any processing we might do before or after parsing to form our programming
 language. At this point we need to concern ourselves with context-free languages and to what extent they apply, so we
 will take a brief overview of what LR(k) languages are, what LR(1) languages are, and how we can use the LR algorithm
 to write a generic parser for any sort of grammar we can think of. We will be working with context-free grammars and
@@ -437,7 +438,7 @@ is in the process of parsing.
 
 Let us first look at an example from our grammar.
 
-```
+```BNF
 <expr> ::= <expr> + <term>
 <term> ::= <term> * <factor>
 <expr> ::= <term>
@@ -453,7 +454,7 @@ To aid in our understanding, we will also start looking at another formal gramma
 which is also a subset of our programming language's final context-free grammar.
 
 
-```
+```BNF
 <S> ::= ( <S> )
 <S> ::= <S> <S>
 <S> ::= <epsilon>
@@ -829,7 +830,7 @@ int ReduceComparisonA(SYNTAX_TREE* node)
 
 
 We can see how our simple production rules are able to split the work that we are doing into manageable chunks. Our
-rule isn't considered with the details of how a \<comparison\> or an \<arithmetic\> symbol is resolved into an 
+rule isn't concerned with the details of how a \<comparison\> or an \<arithmetic\> symbol is resolved into an 
 expression or a VALUE in our backend. Instead, we can focus on the atomic operation of equality. Here we have made
 external the actual logic of CompareEquality to make our code more readable. Since we have a listing of 50 to 100
 grammar productions, we want them to be as short as possible. This allows us to keep them in one place and ensure
@@ -880,7 +881,9 @@ int InterpretNode(SYNTAX_TREE* node)
         case 0x09: return ReduceStmtB(node);
         case 0x0A: return ReduceStmtC(node);
 
+        
         ...
+        
         case 0x74: return ReduceBooleanA(node);
         case 0x75: return ReduceBooleanB(node);
     default:
@@ -925,7 +928,7 @@ are using for syntactic forms that don't necessarily make sense on their own.
 Let's look at our grammar for function definitions, a certain kind of statement.
 
 
-```
+```BNF
 <function def> ::= function <identifier> <parameters> <endl> <stmt list> end
 <parameters> ::= <epsilon>
 <parameters> ::= ( )
@@ -973,7 +976,7 @@ it in our language's environment.
 
 Consider the case where we allow assignment to variables from expressions or from other assignments:
 
-```
+```BNF
 <assignment> ::= <l-value> = <assignment>
 <assignment> ::= <l-value> = <condition>
 ```
@@ -989,7 +992,7 @@ used to address l-values.
 
 Let's see this defined in context-free statements.
 
-```
+```BNF
 <l-value> ::= <identifier>
 <l-value> ::= ( <l-value> )
 <l-value> ::= <reference> . <identifier>
@@ -1058,9 +1061,9 @@ In discussing the syntax for an 'else if' more than the procedures of how else b
 should be on about the same difficulty as our other language elements, we will have to go back to the grammar.
 
 
-One possible way of formalizing this in a context free manner is the following.
+One possible way of formalizing this in a context-free manner is the following.
 
-```
+```BNF
 <if> ::= if <condition> then <endl> <stmt list> <else if>
 <else if> ::= else <endl> <stmt list> end
 <else if> ::= else <if>
@@ -1072,7 +1075,7 @@ definition as to how a sequence of if, else if, and else statements should be pa
 
 
 Pragmatically then, we will interpret the \<else if\> node only if the condition is false. In that case, that could
-lead to either a \<stmt list\> that is always executed, an \<if\> statement this is also executed, or an empty
+lead to either a \<stmt list\> that is always executed, an \<if\> statement that is also executed, or an empty
 production.
 
 
@@ -1087,7 +1090,7 @@ types, including lists, trees, dictionaries, and hash tables.
 #### Part 7: The Virtual Environment
 
 First and foremost, we must have some idea of the data that we will be working with and manipulating in our
-language's runtime. As we have already decided, values that are used in a *duck program* must be stored with
+language's runtime. As we have already decided, values that are used in a *Duck program* must be stored with
 information about their type because of its dynamic nature. We have also discovered that the built-in types for
 integers and floating-point numbers can be passed by value, stored in a VALUE structure, and that strings, functions,
 and dictionaries must be passed by reference, as pointers in a VALUE structure. 
@@ -1137,7 +1140,7 @@ the whole thing. We should also recognize when we have encountered a syntax erro
 Here is a simple program, written in *Duck*, that provides an interactive interpreter. It is included in the main
 program, to be executed when running the interpreter without any input.
 
-```
+```Duck
 /* Duck REPL ** Enter statements to be evaluated. */
 duck.println("Duck Language REPL - type quit() to exit")
 running = true
@@ -1191,7 +1194,7 @@ with some simple manipulation, we can create our own namespace for a library by 
 The way that our library will interface with *the Duck language* is relatively simple. At start up, the language will
 bind libraries that are included in its distribution. During this phase, the library has the opportunity to create
 hooks for its common functions, data, and constant data. Functions are integrated by first providing a pointer to the
-procedure and then providing a list of the named parameters. As we allow for any type of object to passed as
+procedure and then providing a list of the named parameters. As we allow for any type of object to be passed as
 variables, our external code will have to retrieve VALUE objects and handle them manually.
 
 
@@ -1228,19 +1231,16 @@ variables, it increases again. If the scope or context holding these references 
 decreases, until finally, if the last reference to the object is lost, it should be destroyed or freed. 
 
 
-When working correctly, which is not something I was able to achieve, there are a number of advantages to reference
-counting as a garbage collection method. First of all, it does not require stopping execution to reclaim memory. This
-is something that happens automatically as objects come into and out of scope. It is also relatively easy to
-understand and should be simple to implement. Unfortunately, I was unable to find all of the possible edge cases
-where references were created and lost, so I was not able to test this method. This leads me to the drawbacks.
+There are a number of advantages to reference counting as a garbage collection method. First of all, it does not require
+stopping execution to reclaim memory. This is something that happens automatically as objects come into and out of scope.
+It is also relatively easy to understand and should be simple to implement.
 
 
-Reference counting as a form of garbage collection requires a careful watch on when objects are destroyed. If an
+Reference counting as a form of garbage collection requires a careful watch on when objects are destroyed. If an 
 object is destroyed, all of its elements must be checked to decrement references that they may hold to other objects.
-All of the possible places where references can be made, increased, or decreased have to be handled precisely, as if
-we lose count by one, then we will either leak memory or try to free the same memory twice. Additionally, there are
-certain types of circular references that may never be freed under this scheme, although that's not a huge concern to
-look at from the start.
+All of the possible places where references can be made, increased, or decreased have to be handled precisely, as if 
+we lose count by one, then we will either leak memory or try to free the same memory twice. Additionally, there are 
+certain types of circular references that may never be freed under this scheme.
 
 
 Which leads us to the next form of garbage collection: the tracing garbage collector. What this method involves is,
@@ -1262,7 +1262,7 @@ references. It's also very much behind the scenes, as long as allocations are be
 
 
 The *Duck programming language* currently uses a tracing garbage collector. It is highly accurate and handles a
-number issues like dead call stacks and parameter lists rather well. One concern would be to offer better integration
+number of issues like dead call stacks and parameter lists rather well. One concern would be to offer better integration
 with user libraries, which is definitely one area for improvement in the future. There are also a number of ways to
 go about improving its performance by using better data structures.
 
@@ -1329,6 +1329,7 @@ Best of luck.
 
 The legendary green and red dragon books, by Aho and Ullman and Aho, Sethi, and Ullman.
 
+
 ![The Green Dragon Book](green.jpg?raw=true "Green") ![The Red Dragon Book](red.jpg?raw=true "Red")
 
 [1] "Principles of Compiler Design." Alfred Aho and Jeffrey Ullman.
@@ -1337,3 +1338,8 @@ The legendary green and red dragon books, by Aho and Ullman and Aho, Sethi, and 
 
 [3] [The Duck Programming Language Official Website](http://www.ducklang.org/) 
 
+[4] The Duck Programming Language [Parser Generator](https://github.com/gregtour/parsergenerator)
+
+[5] "Engineering a Compiler." 2nd Edition. Keith Cooper and Linda Torczon. Morgan Kaufmann 2011.
+
+[6] [CSSE 304 and CSSE 404](http://www.rose-hulman.edu/class/csse/csse404/201230/)

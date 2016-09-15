@@ -1,0 +1,150 @@
+DesignAPL II Notes-
+
+Steps - 
+
+PART ONE
+Write a lexer and parser. Write a grammar.
+Parse a program with the parser built from the grammar.
+Give good parsing and lexing errors.
+Write an evaluator (interpreter).
+
+PART TWO
+Convert AST to SSA.
+Do type checking. (Easier after SSA?)
+Generate code
+  Work out the addition language. Works with memory mapped variables and two/three registers.
+  What about addition with parentheses? Works with SSA.
+  What about addition with parentheses and functions? 
+    Works with SSA, stack-based variables, and stack maintenance.
+
+Everything else.
+  Core language has binary operations, stack variables, functions, loops, conditionals.
+  Handle different code paths.
+  Optimization and Advanced Error and Type Checking
+  
+PART THREE POINT ONE
+Turing Completeness Requires More
+  Add heap allocations or dynamic data structures.
+  
+PART THREE POINT FIVE
+  Compare with stack based operations. Stack -> Registers "state" machine.
+  Register allocation zaniness.
+
+PART THREE & FOUR
+ Add functional programming features.
+ Add advanced functional programming features.
+ Add reference counted garbage collection.
+ Support Call/CC
+ The end. Or is it.
+
+Experimental features. Context-free macros.
+
+
+Rhetorical devices
+Program, Recipe, Baking Good
+Program, Blueprint, Road
+Stack machine to register layout, road building machine.
+
+
+
+Addition Language
+-----------------
+
+Grammar:
+
+<S> ::= <T>; <S>
+<S> ::= <epsilon>
+X <T> ::= <E>
+<T> ::= <identifier> = <E>
+<E> ::= <identifier>
+<E> ::= <integer>
+<E> ::= <E> + <E>
+X <E> ::= ( <E> )
+
+
+Examples:
+
+A = 0;
+A = 1 + 1;
+B = 1 + 2 + 3 + A + A + A;
+B = A + B + B + B + 1 + 1 + 1 + 1 + 1 + 1 + 1 + A + B + A;
+A = B;
+B = A;
+A = 1;
+
+CONVERT TO SSA
+
+A = 0;
+A = 1 + 1;
+B1 = 1 + 2;
+B2 = B1 + 3;
+B3 = B2 + A;
+B4 = B3 + A;
+B = B4 + A
+...
+
+A = 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1;
+
+A = (1 + 1 + 1 + 1) + (1 + 1 + 1 + 1);
+=>
+A1 = 1 + 1 + 1 + 1;
+A2 = 1 + 1 + 1 + 1;
+A = A1 + A2;
+
+
+X = 1 + A(B(1, 2) + C(1 + 2, X, 2 + X + X)) + 2;
+=>
+B1 = B(1, 2)
+C1 = 1 + 2
+C2 = 2 + X
+C3 = C2 + X
+C4 = C(C1, X, C3)
+A1 = B1 + C4
+X1 = 1 + A1
+X = X1 + 2
+
+
+Code:
+
+# LINE 1
+load result 0			; A = 0
+store result [A]
+load add 1
+
+# LINE 2
+load addand 1			; A = 1 + 1
+add add, addand, result
+store result [A]
+
+# LINE 3
+load add 1				; B = (1 + 2) + 3 + A + A + A;
+load addand 2
+add add, addand, result
+put result, add
+load 3 addand			; B = 1 + 2(+ 3) + A + A + A;
+add add, addand, result
+put result, add
+retrieve [A] add 		; B = 1 + 2 + 3(+ A)+ A + A;
+add add, addand, result
+put result, add
+retrieve [A] add 		; B = 1 + 2 + 3 + A(+ A)+ A;
+add add, addand, result
+put result, add
+retrieve [A] add 		; B = 1 + 2 + 3 + A + A(+ A);
+add add, addand, result
+store result [B]
+
+# LINE 4 ...
+
+# LINE 5
+retrieve [B] result
+store result [A]
+
+# LINE 6
+retrieve [A] result
+store result [B]
+
+# LINE 7
+load result 1
+store result [A]
+
